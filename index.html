@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ماشین حساب قیمت لوله مسی</title>
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="icons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="icons/favicon-16x16.png"
+    />
+    <link rel="shortcut icon" href="icons/favicon.ico" />
+
+    <!-- تگ‌های PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#1e88e5" />
+    <meta
+      name="description"
+      content="ماشین حساب قیمت لوله مسی، عایق و پرایمر"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="لوله مسی" />
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png" />
+
+    <link rel="stylesheet" href="styles.css" />
+    <!-- فونت‌های ایران سنس -->
+    <link
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div class="header">
+      <h1>ماشین حساب قیمت لوله مسی</h1>
+    </div>
+
+    <div class="container">
+      <div class="shared-inputs card">
+        <h3>اطلاعات پایه</h3>
+        <label>متراژ:</label>
+        <input
+          type="number"
+          id="length"
+          placeholder="متراژ را وارد کنید"
+          oninput="updateAll()"
+        />
+        <label>قیمت واحد (ریال):</label>
+        <input
+          type="number"
+          id="unitPrice"
+          placeholder="قیمت واحد را وارد کنید"
+          oninput="updateAll()"
+        />
+        <button class="btn-reset" onclick="resetForm()">پاک کردن همه</button>
+      </div>
+
+      <div class="calculator card">
+        <div class="card-header">
+          <h3>محاسبه قیمت ۱</h3>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="enable1"
+              checked
+              onchange="updateAll()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <label>سایز:</label>
+        <select id="size1" onchange="updateAll()">
+          <option value="1/4">1/4</option>
+          <option value="3/8">3/8</option>
+          <option value="1/2">1/2</option>
+          <option value="5/8">5/8</option>
+        </select>
+        <label>ضخامت:</label>
+        <select id="thickness1" onchange="updateAll()">
+          <option value="0.25">0.25</option>
+          <option value="0.30">0.30</option>
+        </select>
+        <div class="result" id="output1"></div>
+      </div>
+
+      <div class="calculator card">
+        <div class="card-header">
+          <h3>محاسبه قیمت ۲</h3>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="enable2"
+              checked
+              onchange="updateAll()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <label>سایز:</label>
+        <select id="size2" onchange="updateAll()">
+          <option value="1/4">1/4</option>
+          <option value="3/8">3/8</option>
+          <option value="1/2">1/2</option>
+          <option value="5/8">5/8</option>
+        </select>
+        <label>ضخامت:</label>
+        <select id="thickness2" onchange="updateAll()">
+          <option value="0.25">0.25</option>
+          <option value="0.30">0.30</option>
+        </select>
+        <div class="result" id="output2"></div>
+      </div>
+
+      <div class="calculator card">
+        <div class="card-header">
+          <h3>محاسبه عایق</h3>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="enableInsulation"
+              checked
+              onchange="updateAll()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="result-box">
+          <div class="price-item">
+            <div class="price-label">تعداد عایق:</div>
+            <div class="price-value"><span id="insulation-count">0</span></div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">قیمت یک جفت عایق:</div>
+            <div class="price-value"><span id="pair-price">0</span> ريال</div>
+          </div>
+          <div class="price-item total-price-item">
+            <div class="price-label">قیمت کل عایق ها:</div>
+            <div class="price-value"><span id="total-price">0</span> ريال</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calculator card">
+        <div class="card-header">
+          <h3>محاسبه پرایمر</h3>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="enablePrimer"
+              checked
+              onchange="updateAll()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <label>نوع پرایمر:</label>
+        <select id="primerType" onchange="updateAll()">
+          <option value="high">پرایمر دور بالا</option>
+          <option value="low">پرایمر دور پایین</option>
+          <option value="tableHigh">پرایمر سفره‌ای دور بالا</option>
+          <option value="tableLow">پرایمر سفره‌ای دور پایین</option>
+        </select>
+        <div class="result-box">
+          <div class="price-item">
+            <div class="price-label">تعداد پرایمر مورد نیاز:</div>
+            <div class="price-value"><span id="primer-count">0</span></div>
+          </div>
+          <div class="price-item">
+            <div class="price-label">قیمت هر واحد:</div>
+            <div class="price-value">
+              <span id="primer-unit-price">0</span> ريال
+            </div>
+          </div>
+          <div class="price-item total-price-item">
+            <div class="price-label">قیمت کل پرایمر:</div>
+            <div class="price-value">
+              <span id="primer-total-price">0</span> ريال
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="total card" id="totalPrice">جمع کل: 0 ریال</div>
+
+    <div class="share-container">
+      <button class="btn-share" onclick="shareResults()">
+        اشتراک‌گذاری نتایج
+      </button>
+    </div>
+
+    <div class="footer">
+      <p>ماشین حساب قیمت لوله مسی - نسخه ۲.۱</p>
+      <p>قدرت گرفته از سایت <a href="#" class="frezeld">فریزلنــد</a></p>
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- ثبت سرویس ورکر -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("sw.js")
+            .then((registration) => {
+              console.log("Service Worker ثبت شد:", registration);
+            })
+            .catch((error) => {
+              console.log("ثبت Service Worker با خطا مواجه شد:", error);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
