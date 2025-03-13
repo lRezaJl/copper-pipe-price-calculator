@@ -44,6 +44,11 @@
       rel="stylesheet"
       type="text/css"
     />
+    <!-- آیکون‌ها -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="header">
@@ -51,147 +56,160 @@
     </div>
 
     <div class="container">
-      <div class="shared-inputs card">
-        <h3>اطلاعات پایه</h3>
-        <label>متراژ:</label>
-        <input
-          type="number"
-          id="length"
-          placeholder="متراژ را وارد کنید"
-          oninput="updateAll()"
-        />
-        <label>قیمت واحد (ریال):</label>
-        <input
-          type="number"
-          id="unitPrice"
-          placeholder="قیمت واحد را وارد کنید"
-          oninput="updateAll()"
-        />
-        <button class="btn-reset" onclick="resetForm()">پاک کردن همه</button>
-      </div>
-
-      <div class="calculator card">
-        <div class="card-header">
-          <h3>محاسبه قیمت ۱</h3>
-          <label class="switch">
-            <input
-              type="checkbox"
-              id="enable1"
-              checked
-              onchange="updateAll()"
-            />
-            <span class="slider round"></span>
-          </label>
+      <!-- بخش ورودی‌های مشترک -->
+      <div class="card shared-inputs">
+        <h3 class="section-title">ورودی‌های مشترک</h3>
+        <div class="input-group">
+          <label for="unitPrice">قیمت واحد (ریال):</label>
+          <input
+            type="number"
+            id="unitPrice"
+            placeholder="مثال: 16000000"
+            value="16000000"
+          />
         </div>
-        <label>سایز:</label>
-        <select id="size1" onchange="updateAll()">
-          <option value="1/4">1/4</option>
-          <option value="3/8">3/8</option>
-          <option value="1/2">1/2</option>
-          <option value="5/8">5/8</option>
-        </select>
-        <label>ضخامت:</label>
-        <select id="thickness1" onchange="updateAll()">
-          <option value="0.25">0.25</option>
-          <option value="0.30">0.30</option>
-        </select>
-        <div class="result" id="output1"></div>
-      </div>
-
-      <div class="calculator card">
-        <div class="card-header">
-          <h3>محاسبه قیمت ۲</h3>
-          <label class="switch">
-            <input
-              type="checkbox"
-              id="enable2"
-              checked
-              onchange="updateAll()"
-            />
-            <span class="slider round"></span>
-          </label>
-        </div>
-        <label>سایز:</label>
-        <select id="size2" onchange="updateAll()">
-          <option value="1/4">1/4</option>
-          <option value="3/8">3/8</option>
-          <option value="1/2">1/2</option>
-          <option value="5/8">5/8</option>
-        </select>
-        <label>ضخامت:</label>
-        <select id="thickness2" onchange="updateAll()">
-          <option value="0.25">0.25</option>
-          <option value="0.30">0.30</option>
-        </select>
-        <div class="result" id="output2"></div>
-      </div>
-
-      <div class="calculator card">
-        <div class="card-header">
-          <h3>محاسبه عایق</h3>
-          <label class="switch">
-            <input
-              type="checkbox"
-              id="enableInsulation"
-              checked
-              onchange="updateAll()"
-            />
-            <span class="slider round"></span>
-          </label>
-        </div>
-        <div class="result-box">
-          <div class="price-item">
-            <div class="price-label">تعداد عایق:</div>
-            <div class="price-value"><span id="insulation-count">0</span></div>
-          </div>
-          <div class="price-item">
-            <div class="price-label">قیمت یک جفت عایق:</div>
-            <div class="price-value"><span id="pair-price">0</span> ريال</div>
-          </div>
-          <div class="price-item total-price-item">
-            <div class="price-label">قیمت کل عایق ها:</div>
-            <div class="price-value"><span id="total-price">0</span> ريال</div>
-          </div>
+        <div class="button-group">
+          <button class="btn-reset" onclick="resetForm()">
+            <i class="fas fa-trash-alt"></i> پاک کردن همه
+          </button>
+          <button class="btn-share" onclick="shareResults()">
+            <i class="fas fa-share-alt"></i> اشتراک گذاری
+          </button>
         </div>
       </div>
 
-      <div class="calculator card">
-        <div class="card-header">
-          <h3>محاسبه پرایمر</h3>
-          <label class="switch">
+      <!-- بخش لوله 1 -->
+      <div class="calculator">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="section-title">لوله 1</h3>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enable1"
+                checked
+                onchange="calculatePrice()"
+              />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="input-group">
+            <label for="size1">سایز لوله:</label>
+            <select id="size1" onchange="calculatePrice()">
+              <option value="1/4" selected>1/4</option>
+              <option value="3/8">3/8</option>
+              <option value="1/2">1/2</option>
+              <option value="5/8">5/8</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="thickness1">ضخامت لوله:</label>
+            <select id="thickness1" onchange="calculatePrice()">
+              <option value="0.25" selected>0.25 میلیمتر</option>
+              <option value="0.30">0.30 میلیمتر</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="length1">متراژ (متر):</label>
             <input
-              type="checkbox"
-              id="enablePrimer"
-              checked
-              onchange="updateAll()"
+              type="number"
+              id="length1"
+              placeholder="مثال: 10"
+              onchange="syncLengths(1)"
+              onkeyup="syncLengths(1)"
             />
-            <span class="slider round"></span>
-          </label>
+          </div>
+          <div id="result1" class="result-box"></div>
         </div>
-        <label>نوع پرایمر:</label>
-        <select id="primerType" onchange="updateAll()">
-          <option value="high">پرایمر دور بالا</option>
-          <option value="low">پرایمر دور پایین</option>
-          <option value="tableHigh">پرایمر سفره‌ای دور بالا</option>
-          <option value="tableLow">پرایمر سفره‌ای دور پایین</option>
-        </select>
-        <div class="result-box">
-          <div class="price-item">
-            <div class="price-label">تعداد پرایمر مورد نیاز:</div>
-            <div class="price-value"><span id="primer-count">0</span></div>
+      </div>
+
+      <!-- بخش لوله 2 -->
+      <div class="calculator">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="section-title">لوله 2</h3>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enable2"
+                checked
+                onchange="calculatePrice()"
+              />
+              <span class="slider round"></span>
+            </label>
           </div>
-          <div class="price-item">
-            <div class="price-label">قیمت هر واحد:</div>
-            <div class="price-value">
-              <span id="primer-unit-price">0</span> ريال
-            </div>
+          <div class="input-group">
+            <label for="size2">سایز لوله:</label>
+            <select id="size2" onchange="calculatePrice()">
+              <option value="1/4">1/4</option>
+              <option value="3/8">3/8</option>
+              <option value="1/2">1/2</option>
+              <option value="5/8" selected>5/8</option>
+            </select>
           </div>
-          <div class="price-item total-price-item">
-            <div class="price-label">قیمت کل پرایمر:</div>
-            <div class="price-value">
-              <span id="primer-total-price">0</span> ريال
-            </div>
+          <div class="input-group">
+            <label for="thickness2">ضخامت لوله:</label>
+            <select id="thickness2" onchange="calculatePrice()">
+              <option value="0.25" selected>0.25 میلیمتر</option>
+              <option value="0.30">0.30 میلیمتر</option>
+            </select>
           </div>
+          <div class="input-group">
+            <label for="length2">متراژ (متر):</label>
+            <input
+              type="number"
+              id="length2"
+              placeholder="مثال: 10"
+              onchange="syncLengths(2)"
+              onkeyup="syncLengths(2)"
+            />
+          </div>
+          <div id="result2" class="result-box"></div>
+        </div>
+      </div>
+
+      <div class="calculator">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="section-title">محاسبه عایق</h3>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enableInsulation"
+                checked
+                onchange="calculatePrice()"
+              />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div id="insulationResult" class="result-box"></div>
+        </div>
+      </div>
+
+      <div class="calculator">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="section-title">محاسبه پرایمر</h3>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="enablePrimer"
+                checked
+                onchange="calculatePrice()"
+              />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="input-group">
+            <label for="primerType">نوع پرایمر:</label>
+            <select id="primerType" onchange="calculatePrice()">
+              <option value="high">پرایمر دور بالا</option>
+              <option value="low">پرایمر دور پایین</option>
+              <option value="tableHigh">پرایمر سفره‌ای دور بالا</option>
+              <option value="tableLow">پرایمر سفره‌ای دور پایین</option>
+            </select>
+          </div>
+          <div id="primerResult" class="result-box"></div>
         </div>
       </div>
     </div>
@@ -200,12 +218,18 @@
 
     <div class="share-container">
       <button class="btn-share" onclick="shareResults()">
-        اشتراک‌گذاری نتایج
+        <i class="fas fa-share-alt"></i> اشتراک‌گذاری نتایج
+      </button>
+      <button class="btn-reset" onclick="resetForm()">
+        <i class="fas fa-trash-alt"></i> پاک کردن همه
       </button>
     </div>
 
+    <!-- توست نوتیفیکیشن -->
+    <div id="toast" class="toast">پیام در کلیپ‌بورد کپی شد!</div>
+
     <div class="footer">
-      <p>ماشین حساب قیمت لوله مسی - نسخه ۲.۱</p>
+      <p>ماشین حساب قیمت لوله مسی - نسخه ۲.۲</p>
       <p>قدرت گرفته از سایت <a href="#" class="frezeld">فریزلنــد</a></p>
     </div>
 

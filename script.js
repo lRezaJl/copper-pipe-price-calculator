@@ -18,37 +18,99 @@ const primerPrices = {
   tableLow: { price: 500000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
 };
 
+// همگام سازی متراژ بین لوله‌ها
+function syncLengths(sourceInput) {
+  const length1 = document.getElementById("length1");
+  const length2 = document.getElementById("length2");
+  const enable1 = document.getElementById("enable1");
+  const enable2 = document.getElementById("enable2");
+
+  // اگر متراژ پر شده باشد و فیلد دیگر خالی باشد، مقدار را کپی کن
+  if (sourceInput === 1 && length1.value && !length2.value && enable2.checked) {
+    length2.value = length1.value;
+  } else if (
+    sourceInput === 2 &&
+    length2.value &&
+    !length1.value &&
+    enable1.checked
+  ) {
+    length1.value = length2.value;
+  }
+
+  calculatePrice();
+}
+
 // محاسبه قیمت لوله مسی
-function calculatePrice(calculatorId) {
-  // اگر این بخش غیرفعال است، صفر برگردان
-  if (!document.getElementById("enable" + calculatorId).checked) {
-    document.getElementById("output" + calculatorId).innerHTML =
-      "این بخش غیرفعال است";
+function calculatePrice() {
+  // بررسی وضعیت دکمه‌های فعال/غیرفعال
+  const enable1 = document.getElementById("enable1").checked;
+  const enable2 = document.getElementById("enable2").checked;
+  const enableInsulation = document.getElementById("enableInsulation").checked;
+  const enablePrimer = document.getElementById("enablePrimer").checked;
+
+  // محاسبه قیمت لوله 1
+  const pipe1Price = enable1 ? calculatePipePrice(1) : 0;
+
+  // محاسبه قیمت لوله 2
+  const pipe2Price = enable2 ? calculatePipePrice(2) : 0;
+
+  // محاسبه قیمت عایق
+  const insulationPrice = enableInsulation ? calculateInsulationPrice() : 0;
+
+  // محاسبه قیمت پرایمر
+  const primerPrice = enablePrimer ? calculatePrimerPrice() : 0;
+
+  // محاسبه قیمت کل
+  const totalPrice = pipe1Price + pipe2Price + insulationPrice + primerPrice;
+
+  // نمایش قیمت کل
+  document.getElementById("totalPrice").textContent = `جمع کل: ${formatNumber(
+    totalPrice
+  )} ریال`;
+
+  // ذخیره مقادیر در حافظه محلی
+  saveToLocalStorage();
+}
+
+// محاسبه قیمت یک لوله
+function calculatePipePrice(pipeNumber) {
+  // بررسی کنیم آیا این لوله فعال است یا خیر
+  const isEnabled = document.getElementById(`enable${pipeNumber}`).checked;
+  if (!isEnabled) {
+    const resultBox = document.getElementById(`result${pipeNumber}`);
+    resultBox.innerHTML = "<p>این بخش غیرفعال شده است.</p>";
     return 0;
   }
 
-  const length = parseFloat(document.getElementById("length").value) || 0;
-  const unitPrice = parseFloat(document.getElementById("unitPrice").value) || 0;
-  const size = document.getElementById("size" + calculatorId).value;
-  const thickness = document.getElementById("thickness" + calculatorId).value;
+  const size = document.getElementById(`size${pipeNumber}`).value;
+  const thickness = document.getElementById(`thickness${pipeNumber}`).value;
+  const length = document.getElementById(`length${pipeNumber}`).value;
+  const unitPrice = document.getElementById("unitPrice").value;
+  const resultBox = document.getElementById(`result${pipeNumber}`);
+
+  if (!size || !thickness || !length || !unitPrice) {
+    resultBox.innerHTML = "<p>لطفاً تمام مقادیر را وارد کنید.</p>";
+    return 0;
+  }
+
   const key = `${size}-${thickness}`;
-  const weight = weights[key] || 0;
+  const weight = weights[key];
+  if (!weight) {
+    resultBox.innerHTML = "<p>ترکیب سایز و ضخامت انتخاب شده معتبر نیست.</p>";
+    return 0;
+  }
+
   const pricePerMeter = (weight * unitPrice) / 50;
   const totalPrice = pricePerMeter * length;
 
-  // نمایش نتایج به صورت مرتب‌تر و زیباتر
-  document.getElementById("output" + calculatorId).innerHTML = `
+  resultBox.innerHTML = `
     <div class="price-item">
-      <div class="price-label">قیمت هر متر:</div>
-      <div class="price-value">${Math.round(
-        pricePerMeter
-      ).toLocaleString()} ریال</div>
+      <span class="price-label">قیمت هر متر:</span>
+      <span class="price-value">${formatNumber(pricePerMeter)} ریال</span>
     </div>
     <div class="price-item total-price-item">
-      <div class="price-label">قیمت کل:</div>
-      <div class="price-value">${Math.round(
-        totalPrice
-      ).toLocaleString()} ریال</div>
+      <span class="price-label">قیمت کل:</span>
+      <span class="price-value">${formatNumber(totalPrice)} ریال</span>
     </div>
   `;
 
@@ -56,277 +118,589 @@ function calculatePrice(calculatorId) {
 }
 
 // محاسبه قیمت عایق
-function calculateInsulation() {
-  // اگر این بخش غیرفعال است، صفر برگردان
-  if (!document.getElementById("enableInsulation").checked) {
-    document.getElementById("insulation-count").textContent = "0";
-    document.getElementById("pair-price").textContent = "0";
-    document.getElementById("total-price").textContent = "0";
+function calculateInsulationPrice() {
+  // بررسی آیا عایق فعال است
+  const isEnabled = document.getElementById("enableInsulation").checked;
+  if (!isEnabled) {
+    document.getElementById("insulationResult").innerHTML =
+      "<p>این بخش غیرفعال شده است.</p>";
     return 0;
   }
 
-  const length = parseFloat(document.getElementById("length").value) || 0;
-  const pairsNeeded = Math.ceil(length / 1.8);
-  const price1 = {
-    "1/4": 350000,
-    "3/8": 440000,
-    "1/2": 520000,
-    "5/8": 580000,
-  }[document.getElementById("size1").value];
-  const price2 = {
-    "1/4": 350000,
-    "3/8": 440000,
-    "1/2": 520000,
-    "5/8": 580000,
-  }[document.getElementById("size2").value];
-  const pairPrice = price1 + price2;
-  const totalPrice = pairPrice * pairsNeeded;
+  // بررسی میکنیم آیا اصلاً نیاز به محاسبه عایق هست
+  const insulationResultBox = document.getElementById("insulationResult");
 
-  // نمایش نتایج به صورت مرتب‌تر
-  document.getElementById("insulation-count").textContent = pairsNeeded;
-  document.getElementById("pair-price").textContent =
-    pairPrice.toLocaleString();
-  document.getElementById("total-price").textContent =
-    totalPrice.toLocaleString();
+  // بررسی کنیم آیا لوله‌ها فعال هستند
+  const enable1 = document.getElementById("enable1").checked;
+  const enable2 = document.getElementById("enable2").checked;
+
+  // دریافت مقادیر متراژ
+  const length1 = enable1
+    ? parseFloat(document.getElementById("length1").value) || 0
+    : 0;
+  const length2 = enable2
+    ? parseFloat(document.getElementById("length2").value) || 0
+    : 0;
+
+  if (length1 === 0 && length2 === 0) {
+    insulationResultBox.innerHTML = "<p>لطفاً متراژ لوله‌ها را وارد کنید.</p>";
+    return 0;
+  }
+
+  // دریافت سایز لوله‌ها
+  const size1 = enable1 ? document.getElementById("size1").value : "";
+  const size2 = enable2 ? document.getElementById("size2").value : "";
+
+  if (!size1 && !size2) {
+    insulationResultBox.innerHTML = "<p>لطفاً سایز لوله‌ها را انتخاب کنید.</p>";
+    return 0;
+  }
+
+  // قیمت‌های پایه عایق بر اساس سایز
+  const insulationBasePrice = {
+    "1/4": 350000,
+    "3/8": 440000,
+    "1/2": 520000,
+    "5/8": 580000,
+  };
+
+  // محاسبه برای حالت‌های مختلف
+  let totalPrice = 0;
+
+  // اگر هر دو لوله فعال هستند
+  if (enable1 && enable2 && size1 && size2) {
+    // بررسی می‌کنیم آیا متراژها یکسان هستند یا متفاوت
+    const sameLength = length1 === length2;
+
+    if (sameLength && length1 > 0) {
+      // اگر متراژها یکسان باشند
+      const pairsNeeded = Math.ceil(length1 / 1.8);
+      const price1 = insulationBasePrice[size1] || 0;
+      const price2 = insulationBasePrice[size2] || 0;
+      const pairPrice = price1 + price2;
+      totalPrice = pairPrice * pairsNeeded;
+
+      insulationResultBox.innerHTML = `
+        <div class="price-item">
+          <span class="price-label">تعداد عایق:</span>
+          <span class="price-value">${pairsNeeded} جفت</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت یک جفت عایق:</span>
+          <span class="price-value">${formatNumber(pairPrice)} ریال</span>
+        </div>
+        <div class="price-item total-price-item">
+          <span class="price-label">قیمت کل عایق ها:</span>
+          <span class="price-value">${formatNumber(totalPrice)} ریال</span>
+        </div>
+      `;
+    } else if (length1 > 0 && length2 > 0) {
+      // اگر متراژها متفاوت باشند، دو محاسبه جداگانه انجام می‌دهیم
+      const pairs1Needed = Math.ceil(length1 / 1.8);
+      const pairs2Needed = Math.ceil(length2 / 1.8);
+
+      const price1 = insulationBasePrice[size1] || 0;
+      const price2 = insulationBasePrice[size2] || 0;
+
+      const totalPrice1 = price1 * pairs1Needed;
+      const totalPrice2 = price2 * pairs2Needed;
+      totalPrice = totalPrice1 + totalPrice2;
+
+      insulationResultBox.innerHTML = `
+        <h4>عایق برای لوله 1:</h4>
+        <div class="price-item">
+          <span class="price-label">تعداد عایق:</span>
+          <span class="price-value">${pairs1Needed} عدد</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت هر عایق:</span>
+          <span class="price-value">${formatNumber(price1)} ریال</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت کل:</span>
+          <span class="price-value">${formatNumber(totalPrice1)} ریال</span>
+        </div>
+        
+        <h4>عایق برای لوله 2:</h4>
+        <div class="price-item">
+          <span class="price-label">تعداد عایق:</span>
+          <span class="price-value">${pairs2Needed} عدد</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت هر عایق:</span>
+          <span class="price-value">${formatNumber(price2)} ریال</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت کل:</span>
+          <span class="price-value">${formatNumber(totalPrice2)} ریال</span>
+        </div>
+        
+        <div class="price-item total-price-item">
+          <span class="price-label">جمع کل عایق ها:</span>
+          <span class="price-value">${formatNumber(totalPrice)} ریال</span>
+        </div>
+      `;
+    }
+  } else {
+    // اگر فقط یک لوله فعال است
+    const activeSize = enable1 ? size1 : size2;
+    const activeLength = enable1 ? length1 : length2;
+
+    if (activeSize && activeLength > 0) {
+      const pairsNeeded = Math.ceil(activeLength / 1.8);
+      const price = insulationBasePrice[activeSize] || 0;
+      totalPrice = price * pairsNeeded;
+
+      insulationResultBox.innerHTML = `
+        <div class="price-item">
+          <span class="price-label">تعداد عایق:</span>
+          <span class="price-value">${pairsNeeded} عدد</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت هر عایق:</span>
+          <span class="price-value">${formatNumber(price)} ریال</span>
+        </div>
+        <div class="price-item total-price-item">
+          <span class="price-label">قیمت کل عایق ها:</span>
+          <span class="price-value">${formatNumber(totalPrice)} ریال</span>
+        </div>
+      `;
+    }
+  }
 
   return totalPrice;
 }
 
 // محاسبه قیمت پرایمر
-function calculatePrimer() {
-  // اگر این بخش غیرفعال است، صفر برگردان
-  if (!document.getElementById("enablePrimer").checked) {
-    document.getElementById("primer-count").textContent = "0";
-    document.getElementById("primer-unit-price").textContent = "0";
-    document.getElementById("primer-total-price").textContent = "0";
+function calculatePrimerPrice() {
+  // بررسی آیا پرایمر فعال است
+  const isEnabled = document.getElementById("enablePrimer").checked;
+  if (!isEnabled) {
+    document.getElementById("primerResult").innerHTML =
+      "<p>این بخش غیرفعال شده است.</p>";
     return 0;
   }
 
-  const length = parseFloat(document.getElementById("length").value) || 0;
   const primerType = document.getElementById("primerType").value;
-  const primerInfo = primerPrices[primerType];
+  const primerResultBox = document.getElementById("primerResult");
 
-  const unitsNeeded = Math.ceil(length / primerInfo.perLength);
+  if (!primerType) {
+    primerResultBox.innerHTML = "<p>لطفاً نوع پرایمر را انتخاب کنید.</p>";
+    return 0;
+  }
+
+  // بررسی کنیم آیا لوله‌ها فعال هستند
+  const enable1 = document.getElementById("enable1").checked;
+  const enable2 = document.getElementById("enable2").checked;
+
+  // دریافت مقادیر متراژ فقط از لوله‌های فعال
+  const length1 = enable1
+    ? parseFloat(document.getElementById("length1").value) || 0
+    : 0;
+  const length2 = enable2
+    ? parseFloat(document.getElementById("length2").value) || 0
+    : 0;
+
+  // اگر هیچ متراژی وارد نشده باشد، نتیجه را خالی می‌کنیم
+  if (length1 === 0 && length2 === 0) {
+    primerResultBox.innerHTML = "<p>لطفاً متراژ لوله‌ها را وارد کنید.</p>";
+    return 0;
+  }
+
+  const primerInfo = primerPrices[primerType];
+  const totalLength = length1 + length2;
+  const unitsNeeded = Math.ceil(totalLength / primerInfo.perLength);
   const unitPrice = primerInfo.price;
   const totalPrice = unitPrice * unitsNeeded;
 
-  // نمایش نتایج به صورت مرتب‌تر
-  document.getElementById("primer-count").textContent = unitsNeeded;
-  document.getElementById("primer-unit-price").textContent =
-    unitPrice.toLocaleString();
-  document.getElementById("primer-total-price").textContent =
-    totalPrice.toLocaleString();
+  primerResultBox.innerHTML = `
+    <div class="price-item">
+      <span class="price-label">تعداد پرایمر مورد نیاز:</span>
+      <span class="price-value">${unitsNeeded} عدد</span>
+    </div>
+    <div class="price-item">
+      <span class="price-label">قیمت هر واحد:</span>
+      <span class="price-value">${formatNumber(unitPrice)} ریال</span>
+    </div>
+    <div class="price-item total-price-item">
+      <span class="price-label">قیمت کل پرایمر:</span>
+      <span class="price-value">${formatNumber(totalPrice)} ریال</span>
+    </div>
+  `;
 
   return totalPrice;
 }
 
-// به‌روزرسانی تمام محاسبات
-function updateAll() {
-  const total =
-    calculatePrice(1) +
-    calculatePrice(2) +
-    calculateInsulation() +
-    calculatePrimer();
-  document.getElementById("totalPrice").textContent = `جمع کل: ${Math.round(
-    total
-  ).toLocaleString()} ریال`;
+// تابع اشتراک گذاری نتایج
+function shareResults() {
+  // تاریخ امروز
+  const today = new Date();
+  const dateFormatted = `${today.getFullYear()}/${
+    today.getMonth() + 1
+  }/${today.getDate()}`;
 
-  // ذخیره مقادیر در localStorage
-  saveFormData();
+  // بررسی کنیم آیا لوله‌ها فعال هستند
+  const enable1 = document.getElementById("enable1").checked;
+  const enable2 = document.getElementById("enable2").checked;
+  const enableInsulation = document.getElementById("enableInsulation").checked;
+  const enablePrimer = document.getElementById("enablePrimer").checked;
+
+  // دریافت اطلاعات لوله 1
+  const size1 = enable1 ? document.getElementById("size1").value || "-" : "-";
+  const thickness1 = enable1
+    ? document.getElementById("thickness1").value || "-"
+    : "-";
+  const length1 = enable1
+    ? document.getElementById("length1").value || "0"
+    : "0";
+
+  let pipe1PricePerMeter = 0;
+  let pipe1TotalPrice = 0;
+
+  if (enable1 && size1 !== "-" && thickness1 !== "-" && length1 !== "0") {
+    const key1 = `${size1}-${thickness1}`;
+    const weight1 = weights[key1];
+    const unitPrice = document.getElementById("unitPrice").value;
+    pipe1PricePerMeter = (weight1 * unitPrice) / 50;
+    pipe1TotalPrice = pipe1PricePerMeter * length1;
+  }
+
+  // دریافت اطلاعات لوله 2
+  const size2 = enable2 ? document.getElementById("size2").value || "-" : "-";
+  const thickness2 = enable2
+    ? document.getElementById("thickness2").value || "-"
+    : "-";
+  const length2 = enable2
+    ? document.getElementById("length2").value || "0"
+    : "0";
+
+  let pipe2PricePerMeter = 0;
+  let pipe2TotalPrice = 0;
+
+  if (enable2 && size2 !== "-" && thickness2 !== "-" && length2 !== "0") {
+    const key2 = `${size2}-${thickness2}`;
+    const weight2 = weights[key2];
+    const unitPrice = document.getElementById("unitPrice").value;
+    pipe2PricePerMeter = (weight2 * unitPrice) / 50;
+    pipe2TotalPrice = pipe2PricePerMeter * length2;
+  }
+
+  // قیمت‌های پایه عایق بر اساس سایز
+  const insulationBasePrice = {
+    "1/4": 350000,
+    "3/8": 440000,
+    "1/2": 520000,
+    "5/8": 580000,
+  };
+
+  // محاسبه تعداد و قیمت کل عایق
+  let insulationInfo = "";
+  let totalInsulationPrice = 0;
+
+  if (enableInsulation && (enable1 || enable2)) {
+    // بررسی می‌کنیم آیا متراژها یکسان هستند یا متفاوت
+    const sameLength =
+      length1 === length2 || length1 === "0" || length2 === "0";
+    const effectiveLength = Math.max(
+      parseFloat(length1) || 0,
+      parseFloat(length2) || 0
+    );
+
+    if (
+      enable1 &&
+      enable2 &&
+      size1 !== "-" &&
+      size2 !== "-" &&
+      effectiveLength > 0
+    ) {
+      if (sameLength) {
+        // اگر متراژها یکسان باشند، یا فقط یکی وارد شده باشد
+        const pairsNeeded = Math.ceil(effectiveLength / 1.8);
+        const price1 = insulationBasePrice[size1] || 0;
+        const price2 = insulationBasePrice[size2] || 0;
+        const pairPrice = price1 + price2;
+        totalInsulationPrice = pairPrice * pairsNeeded;
+
+        insulationInfo = `عایق ${size1} و ${size2}  |  ${pairsNeeded} جفت  |  ${formatNumber(
+          pairPrice
+        )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
+      } else if (parseFloat(length1) > 0 && parseFloat(length2) > 0) {
+        // اگر متراژها متفاوت باشند، دو محاسبه جداگانه انجام می‌دهیم
+        const pairs1Needed = Math.ceil(parseFloat(length1) / 1.8);
+        const pairs2Needed = Math.ceil(parseFloat(length2) / 1.8);
+
+        const price1 = insulationBasePrice[size1] || 0;
+        const price2 = insulationBasePrice[size2] || 0;
+
+        const totalPrice1 = price1 * pairs1Needed;
+        const totalPrice2 = price2 * pairs2Needed;
+        totalInsulationPrice = totalPrice1 + totalPrice2;
+
+        insulationInfo =
+          `عایق ${size1}  |  ${pairs1Needed} عدد  |  ${formatNumber(
+            price1
+          )} ریال  |  ${formatNumber(totalPrice1)} ریال\n` +
+          `عایق ${size2}  |  ${pairs2Needed} عدد  |  ${formatNumber(
+            price2
+          )} ریال  |  ${formatNumber(totalPrice2)} ریال`;
+      }
+    } else if (enable1 && size1 !== "-" && parseFloat(length1) > 0) {
+      // فقط لوله 1 فعال است
+      const pairsNeeded = Math.ceil(parseFloat(length1) / 1.8);
+      const price = insulationBasePrice[size1] || 0;
+      totalInsulationPrice = price * pairsNeeded;
+      insulationInfo = `عایق ${size1}  |  ${pairsNeeded} عدد  |  ${formatNumber(
+        price
+      )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
+    } else if (enable2 && size2 !== "-" && parseFloat(length2) > 0) {
+      // فقط لوله 2 فعال است
+      const pairsNeeded = Math.ceil(parseFloat(length2) / 1.8);
+      const price = insulationBasePrice[size2] || 0;
+      totalInsulationPrice = price * pairsNeeded;
+      insulationInfo = `عایق ${size2}  |  ${pairsNeeded} عدد  |  ${formatNumber(
+        price
+      )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
+    }
+  }
+
+  // دریافت اطلاعات پرایمر
+  const primerTypeSelect = document.getElementById("primerType");
+  const primerType = enablePrimer ? primerTypeSelect.value || "-" : "-";
+  const primerTypeText = enablePrimer
+    ? primerTypeSelect.options[primerTypeSelect.selectedIndex].text || "-"
+    : "-";
+
+  // محاسبه تعداد و قیمت کل پرایمر
+  let totalPrimerPrice = 0;
+  let primerCount = 0;
+
+  if (enablePrimer && primerType !== "-") {
+    const primerInfo = primerPrices[primerType];
+    const totalLength = parseFloat(length1) + parseFloat(length2);
+    primerCount = Math.ceil(totalLength / primerInfo.perLength);
+    totalPrimerPrice = primerCount * primerInfo.price;
+  }
+
+  // محاسبه جمع کل
+  const grandTotal =
+    pipe1TotalPrice + pipe2TotalPrice + totalInsulationPrice + totalPrimerPrice;
+
+  // ساخت متن فاکتور
+  let invoiceText = `*فروشگاه فریزلنــد*    *${dateFormatted}*\n`;
+
+  if (enable1 && size1 !== "-" && length1 !== "0") {
+    invoiceText += `لوله ۱: سایز ${size1} - ضخامت ${thickness1}  |  ${length1} متر  |  ${formatNumber(
+      pipe1PricePerMeter
+    )} ریال  |  ${formatNumber(pipe1TotalPrice)} ریال\n`;
+  }
+
+  if (enable2 && size2 !== "-" && length2 !== "0") {
+    invoiceText += `لوله ۲: سایز ${size2} - ضخامت ${thickness2}  |  ${length2} متر  |  ${formatNumber(
+      pipe2PricePerMeter
+    )} ریال  |  ${formatNumber(pipe2TotalPrice)} ریال\n`;
+  }
+
+  if (enableInsulation && insulationInfo) {
+    invoiceText += `\n${insulationInfo}\n`;
+  }
+
+  if (enablePrimer && primerType !== "-") {
+    invoiceText += `\nپرایمر ${primerTypeText}  |  ${primerCount} عدد  |  ${formatNumber(
+      totalPrimerPrice
+    )} ریال\n`;
+  }
+
+  invoiceText += `\n*جمع کل: ${formatNumber(grandTotal)} ریال*`;
+
+  // بررسی اینکه آیا موبایل است یا دسکتاپ
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  // اشتراک گذاری متن فاکتور
+  if (isMobile && navigator.share) {
+    navigator
+      .share({
+        title: "فاکتور لوله مسی",
+        text: invoiceText,
+      })
+      .catch((error) => {
+        copyToClipboard(invoiceText);
+        showToast("متن فاکتور در کلیپ‌بورد کپی شد!");
+      });
+  } else {
+    copyToClipboard(invoiceText);
+    showToast("متن فاکتور در کلیپ‌بورد کپی شد!");
+  }
 }
 
-// پاک کردن فرم
-function resetForm() {
-  document.getElementById("length").value = "";
-  document.getElementById("unitPrice").value = "";
-  document.getElementById("size1").selectedIndex = 0;
-  document.getElementById("thickness1").selectedIndex = 0;
-  document.getElementById("size2").selectedIndex = 0;
-  document.getElementById("thickness2").selectedIndex = 0;
-  document.getElementById("primerType").selectedIndex = 0;
+// تابع کپی کردن متن در کلیپ‌بورد
+function copyToClipboard(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
 
-  // بازنشانی چک‌باکس‌ها
+// نمایش پیام توست
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.className = "toast show";
+
+  // پس از 3 ثانیه پنهان می‌شود
+  setTimeout(() => {
+    toast.className = toast.className.replace("show", "");
+  }, 3000);
+}
+
+// پاک کردن تمام فرم‌ها
+function resetForm() {
+  // پاک کردن ورودی‌های مشترک
+  document.getElementById("unitPrice").value = "16000000";
+
+  // فعال کردن تمام بخش‌ها
   document.getElementById("enable1").checked = true;
   document.getElementById("enable2").checked = true;
   document.getElementById("enableInsulation").checked = true;
   document.getElementById("enablePrimer").checked = true;
 
-  document.getElementById("output1").innerHTML = "";
-  document.getElementById("output2").innerHTML = "";
-  document.getElementById("insulation-count").textContent = "0";
-  document.getElementById("pair-price").textContent = "0";
-  document.getElementById("total-price").textContent = "0";
-  document.getElementById("primer-count").textContent = "0";
-  document.getElementById("primer-unit-price").textContent = "0";
-  document.getElementById("primer-total-price").textContent = "0";
+  // پاک کردن ورودی‌های لوله 1
+  document.getElementById("size1").selectedIndex = 0;
+  document.getElementById("thickness1").selectedIndex = 0;
+  document.getElementById("length1").value = "";
+  document.getElementById("result1").innerHTML = "";
+
+  // پاک کردن ورودی‌های لوله 2
+  document.getElementById("size2").selectedIndex = 0;
+  document.getElementById("thickness2").selectedIndex = 0;
+  document.getElementById("length2").value = "";
+  document.getElementById("result2").innerHTML = "";
+
+  // پاک کردن محاسبات عایق
+  if (document.getElementById("insulationResult")) {
+    document.getElementById("insulationResult").innerHTML = "";
+  }
+
+  // پاک کردن ورودی‌های پرایمر
+  if (document.getElementById("primerType")) {
+    document.getElementById("primerType").selectedIndex = 0;
+  }
+  if (document.getElementById("primerResult")) {
+    document.getElementById("primerResult").innerHTML = "";
+  }
+
+  // پاک کردن قیمت کل
   document.getElementById("totalPrice").textContent = "جمع کل: 0 ریال";
 
-  // پاک کردن داده‌های ذخیره شده
-  localStorage.removeItem("calculatorFormData");
+  // پاک کردن حافظه محلی
+  localStorage.removeItem("copperPipeCalculator");
 }
 
-// ذخیره داده‌های فرم در localStorage
-function saveFormData() {
-  const formData = {
-    length: document.getElementById("length").value,
+// فرمت کردن اعداد با جداکننده هزارگان
+function formatNumber(num) {
+  return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
+
+// ذخیره مقادیر در حافظه محلی
+function saveToLocalStorage() {
+  const data = {
     unitPrice: document.getElementById("unitPrice").value,
-    size1: document.getElementById("size1").value,
-    thickness1: document.getElementById("thickness1").value,
-    size2: document.getElementById("size2").value,
-    thickness2: document.getElementById("thickness2").value,
-    primerType: document.getElementById("primerType").value,
     enable1: document.getElementById("enable1").checked,
     enable2: document.getElementById("enable2").checked,
     enableInsulation: document.getElementById("enableInsulation").checked,
     enablePrimer: document.getElementById("enablePrimer").checked,
+    pipe1: {
+      size: document.getElementById("size1").value,
+      thickness: document.getElementById("thickness1").value,
+      length: document.getElementById("length1").value,
+    },
+    pipe2: {
+      size: document.getElementById("size2").value,
+      thickness: document.getElementById("thickness2").value,
+      length: document.getElementById("length2").value,
+    },
+    primer: {
+      type: document.getElementById("primerType").value,
+    },
   };
 
-  localStorage.setItem("calculatorFormData", JSON.stringify(formData));
+  localStorage.setItem("copperPipeCalculator", JSON.stringify(data));
 }
 
-// بازیابی داده‌های فرم از localStorage
-function loadFormData() {
-  const savedData = localStorage.getItem("calculatorFormData");
+// بازیابی مقادیر از حافظه محلی
+function loadFromLocalStorage() {
+  const savedData = localStorage.getItem("copperPipeCalculator");
+  if (!savedData) return;
 
-  if (savedData) {
-    const formData = JSON.parse(savedData);
+  const data = JSON.parse(savedData);
 
-    document.getElementById("length").value = formData.length || "";
-    document.getElementById("unitPrice").value = formData.unitPrice || "";
-
-    // تنظیم مقادیر select
-    setSelectValue("size1", formData.size1);
-    setSelectValue("thickness1", formData.thickness1);
-    setSelectValue("size2", formData.size2);
-    setSelectValue("thickness2", formData.thickness2);
-    setSelectValue("primerType", formData.primerType);
-
-    // تنظیم وضعیت چک‌باکس‌ها
-    document.getElementById("enable1").checked =
-      formData.enable1 !== undefined ? formData.enable1 : true;
-    document.getElementById("enable2").checked =
-      formData.enable2 !== undefined ? formData.enable2 : true;
-    document.getElementById("enableInsulation").checked =
-      formData.enableInsulation !== undefined
-        ? formData.enableInsulation
-        : true;
-    document.getElementById("enablePrimer").checked =
-      formData.enablePrimer !== undefined ? formData.enablePrimer : true;
-
-    // به‌روزرسانی محاسبات
-    updateAll();
+  // بازیابی قیمت واحد
+  if (data.unitPrice) {
+    document.getElementById("unitPrice").value = data.unitPrice;
   }
-}
 
-// تابع کمکی برای تنظیم مقدار select
-function setSelectValue(selectId, value) {
-  if (!value) return;
+  // بازیابی وضعیت فعال/غیرفعال
+  if (data.hasOwnProperty("enable1")) {
+    document.getElementById("enable1").checked = data.enable1;
+  }
+  if (data.hasOwnProperty("enable2")) {
+    document.getElementById("enable2").checked = data.enable2;
+  }
+  if (data.hasOwnProperty("enableInsulation")) {
+    document.getElementById("enableInsulation").checked = data.enableInsulation;
+  }
+  if (data.hasOwnProperty("enablePrimer")) {
+    document.getElementById("enablePrimer").checked = data.enablePrimer;
+  }
 
-  const selectElement = document.getElementById(selectId);
-  for (let i = 0; i < selectElement.options.length; i++) {
-    if (selectElement.options[i].value === value) {
-      selectElement.selectedIndex = i;
-      break;
+  // بازیابی لوله 1
+  if (data.pipe1) {
+    if (data.pipe1.size) {
+      document.getElementById("size1").value = data.pipe1.size;
+    }
+    if (data.pipe1.thickness) {
+      document.getElementById("thickness1").value = data.pipe1.thickness;
+    }
+    if (data.pipe1.length) {
+      document.getElementById("length1").value = data.pipe1.length;
     }
   }
-}
 
-// اشتراک‌گذاری نتایج
-function shareResults() {
-  // جمع‌آوری اطلاعات برای اشتراک‌گذاری
-  const length = document.getElementById("length").value;
-  const unitPrice = document.getElementById("unitPrice").value;
-  const totalPrice = document.getElementById("totalPrice").textContent;
-
-  let resultText = `محاسبه قیمت لوله مسی\n`;
-  resultText += `متراژ: ${length} متر\n`;
-  resultText += `قیمت واحد: ${parseInt(unitPrice).toLocaleString()} ریال\n\n`;
-
-  // اضافه کردن اطلاعات لوله 1 اگر فعال است
-  if (document.getElementById("enable1").checked) {
-    const size1 = document.getElementById("size1").value;
-    const thickness1 = document.getElementById("thickness1").value;
-    resultText += `لوله ۱: سایز ${size1} - ضخامت ${thickness1}\n`;
-  }
-
-  // اضافه کردن اطلاعات لوله 2 اگر فعال است
-  if (document.getElementById("enable2").checked) {
-    const size2 = document.getElementById("size2").value;
-    const thickness2 = document.getElementById("thickness2").value;
-    resultText += `لوله ۲: سایز ${size2} - ضخامت ${thickness2}\n`;
-  }
-
-  // اضافه کردن اطلاعات عایق اگر فعال است
-  if (document.getElementById("enableInsulation").checked) {
-    resultText += `تعداد عایق: ${
-      document.getElementById("insulation-count").textContent
-    }\n`;
-    resultText += `قیمت کل عایق: ${
-      document.getElementById("total-price").textContent
-    } ریال\n`;
-  }
-
-  // اضافه کردن اطلاعات پرایمر اگر فعال است
-  if (document.getElementById("enablePrimer").checked) {
-    const primerType =
-      document.getElementById("primerType").options[
-        document.getElementById("primerType").selectedIndex
-      ].text;
-    resultText += `نوع پرایمر: ${primerType}\n`;
-    resultText += `تعداد پرایمر: ${
-      document.getElementById("primer-count").textContent
-    }\n`;
-    resultText += `قیمت کل پرایمر: ${
-      document.getElementById("primer-total-price").textContent
-    } ریال\n`;
-  }
-
-  resultText += `\n${totalPrice}`;
-
-  // استفاده از Web Share API اگر در مرورگر پشتیبانی می‌شود
-  if (navigator.share) {
-    navigator
-      .share({
-        title: "محاسبه قیمت لوله مسی",
-        text: resultText,
-      })
-      .catch((error) => {
-        fallbackShare(resultText);
-      });
-  } else {
-    fallbackShare(resultText);
-  }
-}
-
-// روش جایگزین برای اشتراک‌گذاری در صورت عدم پشتیبانی از Web Share API
-function fallbackShare(text) {
-  // ایجاد یک المان textarea موقت
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.style.position = "fixed"; // خارج از دید کاربر
-  document.body.appendChild(textarea);
-  textarea.select();
-
-  try {
-    // کپی متن به کلیپ‌بورد
-    const successful = document.execCommand("copy");
-    if (successful) {
-      alert(
-        "نتایج در کلیپ‌بورد کپی شد. اکنون می‌توانید آن را در برنامه دلخواه خود پیست کنید."
-      );
-    } else {
-      alert(
-        "کپی کردن ناموفق بود. لطفاً به صورت دستی متن را انتخاب و کپی کنید."
-      );
+  // بازیابی لوله 2
+  if (data.pipe2) {
+    if (data.pipe2.size) {
+      document.getElementById("size2").value = data.pipe2.size;
     }
-  } catch (err) {
-    alert("خطا در کپی کردن: " + err);
+    if (data.pipe2.thickness) {
+      document.getElementById("thickness2").value = data.pipe2.thickness;
+    }
+    if (data.pipe2.length) {
+      document.getElementById("length2").value = data.pipe2.length;
+    }
   }
 
-  document.body.removeChild(textarea);
+  // بازیابی پرایمر در صورت وجود
+  if (data.primer && document.getElementById("primerType")) {
+    if (data.primer.type) {
+      document.getElementById("primerType").value = data.primer.type;
+    }
+  }
+
+  // محاسبه مجدد قیمت‌ها
+  calculatePrice();
 }
 
-// اجرای بازیابی داده‌ها هنگام بارگذاری صفحه
-window.onload = function () {
-  loadFormData();
-};
+// اجرای محاسبه اولیه و بارگذاری اطلاعات ذخیره شده هنگام بارگذاری صفحه
+document.addEventListener("DOMContentLoaded", function () {
+  // تنظیم مقدار پیش‌فرض برای قیمت واحد
+  document.getElementById("unitPrice").value = "16000000";
+
+  // بارگذاری اطلاعات ذخیره شده
+  loadFromLocalStorage();
+});

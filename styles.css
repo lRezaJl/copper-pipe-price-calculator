@@ -41,6 +41,10 @@ h6 {
   color: var(--primary-dark);
 }
 
+h4 {
+  margin-top: 12px;
+}
+
 .container {
   display: flex;
   justify-content: center;
@@ -60,21 +64,28 @@ h6 {
   border-radius: var(--border-radius);
   background: var(--card-color);
   box-shadow: var(--box-shadow);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+  opacity: 0.8;
 }
 
 .shared-inputs {
   background: linear-gradient(135deg, var(--primary-light), #ffffff);
-  border-top: 4px solid var(--primary-color);
 }
 
-.calculator {
-  border-top: 4px solid var(--accent-color);
+.shared-inputs::before {
+  background: var(--primary-color);
 }
 
 .card-header {
@@ -82,8 +93,6 @@ h6 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
 }
 
 label {
@@ -124,12 +133,13 @@ input::-webkit-inner-spin-button {
 }
 
 .result-box {
-  background: #f8f9fa;
-  padding: 15px;
+  background: rgba(248, 249, 250, 0.9);
+  padding: 6px 18px;
   border-radius: var(--border-radius);
   margin-top: 15px;
   text-align: right;
-  border-right: 3px solid var(--accent-color);
+  border-right: 4px solid var(--accent-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .result {
@@ -186,8 +196,8 @@ input::-webkit-inner-spin-button {
 }
 
 .total {
-  margin-top: 20px;
-  font-size: 22px;
+  margin-top: 25px;
+  font-size: 24px;
   font-weight: bold;
   color: white;
   background: linear-gradient(
@@ -195,13 +205,14 @@ input::-webkit-inner-spin-button {
     var(--primary-color),
     var(--primary-dark)
   );
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .header {
@@ -211,7 +222,7 @@ input::-webkit-inner-spin-button {
     var(--primary-color)
   );
   color: white;
-  padding: 15px;
+  padding: 18px;
   border-radius: var(--border-radius);
   margin-bottom: 20px;
   width: 100%;
@@ -225,19 +236,30 @@ input::-webkit-inner-spin-button {
   margin: 0;
   font-size: 24px;
   color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.btn-reset {
-  background-color: var(--danger-color);
-  color: white;
+/* استایل دکمه‌های اشتراک‌گذاری و پاک کردن */
+.btn-reset,
+.btn-share {
   border: none;
   padding: 12px 20px;
   border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
-  margin-top: 20px;
+  margin: 10px 5px;
   font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
   transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  box-shadow: var(--box-shadow);
+}
+
+.btn-reset {
+  background-color: var(--danger-color);
+  color: white;
 }
 
 .btn-reset:hover {
@@ -247,33 +269,68 @@ input::-webkit-inner-spin-button {
 .btn-share {
   background-color: var(--success-color);
   color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-  font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
-  transition: background-color 0.3s ease;
 }
 
 .btn-share:hover {
   background-color: #388e3c;
 }
 
+.button-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
 .share-container {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 15px auto;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* استایل توست با انیمیشن (حفظ می‌شود چون ضروری است) */
+.toast {
+  visibility: hidden;
+  position: fixed;
+  min-width: 250px;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px;
+  z-index: 1000;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
 }
 
 .footer {
-  margin-top: 30px;
+  margin-top: 40px;
   font-size: 14px;
   color: var(--text-light);
   text-align: center;
-  padding: 10px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .frezeld {
@@ -281,7 +338,7 @@ input::-webkit-inner-spin-button {
   text-decoration: none;
 }
 
-/* Switch styling */
+/* استایل دکمه toggle */
 .switch {
   position: relative;
   display: inline-block;
@@ -318,11 +375,11 @@ input::-webkit-inner-spin-button {
 }
 
 input:checked + .slider {
-  background-color: var(--primary-color);
+  background-color: #4caf50;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--primary-color);
+  box-shadow: 0 0 1px #4caf50;
 }
 
 input:checked + .slider:before {
@@ -330,11 +387,17 @@ input:checked + .slider:before {
 }
 
 .slider.round {
-  border-radius: 34px;
+  border-radius: 24px;
 }
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.section-title {
+  display: inline-block;
+  margin-bottom: 15px;
+  position: relative;
 }
 
 /* برای صفحه نمایش‌های بزرگتر */
@@ -350,7 +413,11 @@ input:checked + .slider:before {
   }
   .calculator {
     width: calc(50% - 10px);
-    height: 100%;
+  }
+
+  .btn-reset,
+  .btn-share {
+    min-width: 180px;
   }
 }
 
@@ -359,4 +426,15 @@ input:checked + .slider:before {
   .calculator {
     width: calc(50% - 10px);
   }
+}
+
+/* استایل برای fa icons در دکمه‌ها */
+.btn-share i,
+.btn-reset i {
+  margin-left: 8px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
 }
