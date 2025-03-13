@@ -331,13 +331,42 @@ function calculatePrimerPrice() {
   return totalPrice;
 }
 
+// تابع تبدیل تاریخ میلادی به شمسی
+function gregorianToJalali(gy, gm, gd) {
+  var g_d_m, jy, jm, jd, gy2, days;
+  g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  gy2 = gm > 2 ? gy + 1 : gy;
+  days =
+    355666 +
+    365 * gy +
+    ~~((gy2 + 3) / 4) -
+    ~~((gy2 + 99) / 100) +
+    ~~((gy2 + 399) / 400) +
+    gd +
+    g_d_m[gm - 1];
+  jy = -1595 + 33 * ~~(days / 12053);
+  days %= 12053;
+  jy += 4 * ~~(days / 1461);
+  days %= 1461;
+  if (days > 365) {
+    jy += ~~((days - 1) / 365);
+    days = (days - 1) % 365;
+  }
+  jm = days < 186 ? 1 + ~~(days / 31) : 7 + ~~((days - 186) / 30);
+  jd = 1 + (days < 186 ? days % 31 : (days - 186) % 30);
+  return [jy, jm, jd];
+}
+
 // تابع اشتراک گذاری نتایج
 function shareResults() {
   // تاریخ امروز
   const today = new Date();
-  const dateFormatted = `${today.getFullYear()}/${
-    today.getMonth() + 1
-  }/${today.getDate()}`;
+  const jalaliDate = gregorianToJalali(
+    today.getFullYear(),
+    today.getMonth() + 1,
+    today.getDate()
+  );
+  const dateFormatted = `${jalaliDate[0]}/${jalaliDate[1]}/${jalaliDate[2]}`;
 
   // بررسی کنیم آیا لوله‌ها فعال هستند
   const enable1 = document.getElementById("enable1").checked;
@@ -577,7 +606,7 @@ function resetForm() {
   document.getElementById("result1").innerHTML = "";
 
   // پاک کردن ورودی‌های لوله 2
-  document.getElementById("size2").selectedIndex = 0;
+  document.getElementById("size2").selectedIndex = 3;
   document.getElementById("thickness2").selectedIndex = 0;
   document.getElementById("length2").value = "";
   document.getElementById("result2").innerHTML = "";
