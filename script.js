@@ -489,13 +489,13 @@ function shareResults() {
   let invoiceText = `*فروشگاه فریزلنــد*    *${dateFormatted}*\n`;
 
   if (enable1 && size1 !== "-" && length1 !== "0") {
-    invoiceText += `لوله ۱: سایز ${size1} - ضخامت ${thickness1}  |  ${length1} متر  |  ${formatNumber(
+    invoiceText += `لوله سایز ${size1} - ضخامت ${thickness1}  |  ${length1} متر  |  ${formatNumber(
       pipe1PricePerMeter
     )} ریال  |  ${formatNumber(pipe1TotalPrice)} ریال\n`;
   }
 
   if (enable2 && size2 !== "-" && length2 !== "0") {
-    invoiceText += `لوله ۲: سایز ${size2} - ضخامت ${thickness2}  |  ${length2} متر  |  ${formatNumber(
+    invoiceText += `لوله سایز ${size2} - ضخامت ${thickness2}  |  ${length2} متر  |  ${formatNumber(
       pipe2PricePerMeter
     )} ریال  |  ${formatNumber(pipe2TotalPrice)} ریال\n`;
   }
