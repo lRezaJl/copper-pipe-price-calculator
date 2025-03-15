@@ -308,27 +308,173 @@ function calculatePrimerPrice() {
   }
 
   const primerInfo = primerPrices[primerType];
-  const totalLength = length1 + length2;
-  const unitsNeeded = Math.ceil(totalLength / primerInfo.perLength);
+  let unitsNeeded = 1;
+  let showManualInput = false;
+
+  // بررسی شرایط متراژ لوله‌ها
+  if (enable1 && enable2 && length1 > 0 && length2 > 0) {
+    // اگر هر دو لوله فعال هستند
+    if (length1 === length2) {
+      // اگر متراژها یکسان هستند، فقط یکی را حساب کن (جفتی)
+      unitsNeeded = Math.ceil(length1 / primerInfo.perLength);
+
+      // اگر فیلد دستی وجود دارد، آن را حذف کنیم
+      const manualInputContainer = document.getElementById(
+        "manualInputContainer"
+      );
+      if (manualInputContainer) {
+        manualInputContainer.style.display = "none";
+      }
+    } else {
+      // اگر متراژها متفاوت هستند، نمایش فیلد دستی
+      showManualInput = true;
+
+      // چک کنیم آیا فیلد دستی وجود دارد
+      let manualInputContainer = document.getElementById(
+        "manualInputContainer"
+      );
+
+      if (!manualInputContainer) {
+        // اگر فیلد دستی وجود ندارد، آن را ایجاد کنیم
+        manualInputContainer = document.createElement("div");
+        manualInputContainer.id = "manualInputContainer";
+        manualInputContainer.className = "input-group mb-2";
+        manualInputContainer.innerHTML = `
+          <label for="manualPrimerCount">تعداد پرایمر (دستی):</label>
+          <input type="number" id="manualPrimerCount" min="1" value="1" />
+        `;
+
+        // افزودن فیلد به ابتدای primerResultBox
+        if (primerResultBox.firstChild) {
+          primerResultBox.insertBefore(
+            manualInputContainer,
+            primerResultBox.firstChild
+          );
+        } else {
+          primerResultBox.appendChild(manualInputContainer);
+        }
+
+        // افزودن event listener برای تغییر مقدار
+        document
+          .getElementById("manualPrimerCount")
+          .addEventListener("input", function () {
+            // فقط قسمت های مربوط به قیمت را به روز کن، نه کل HTML
+            updatePrimerPriceDisplay();
+          });
+      } else {
+        // اگر فیلد دستی وجود دارد، آن را نمایش بده
+        manualInputContainer.style.display = "block";
+      }
+
+      // استفاده از مقدار فیلد دستی
+      const manualField = document.getElementById("manualPrimerCount");
+      if (manualField) {
+        unitsNeeded = parseInt(manualField.value) || 1;
+      }
+    }
+  } else if (enable1 && length1 > 0) {
+    // فقط لوله 1 فعال است
+    unitsNeeded = Math.ceil(length1 / primerInfo.perLength);
+
+    // اگر فیلد دستی وجود دارد، آن را مخفی کنیم
+    const manualInputContainer = document.getElementById(
+      "manualInputContainer"
+    );
+    if (manualInputContainer) {
+      manualInputContainer.style.display = "none";
+    }
+  } else if (enable2 && length2 > 0) {
+    // فقط لوله 2 فعال است
+    unitsNeeded = Math.ceil(length2 / primerInfo.perLength);
+
+    // اگر فیلد دستی وجود دارد، آن را مخفی کنیم
+    const manualInputContainer = document.getElementById(
+      "manualInputContainer"
+    );
+    if (manualInputContainer) {
+      manualInputContainer.style.display = "none";
+    }
+  }
+
   const unitPrice = primerInfo.price;
   const totalPrice = unitPrice * unitsNeeded;
 
-  primerResultBox.innerHTML = `
-    <div class="price-item">
-      <span class="price-label">تعداد پرایمر مورد نیاز:</span>
-      <span class="price-value">${unitsNeeded} عدد</span>
-    </div>
-    <div class="price-item">
-      <span class="price-label">قیمت هر واحد:</span>
-      <span class="price-value">${formatNumber(unitPrice)} ریال</span>
-    </div>
-    <div class="price-item total-price-item">
-      <span class="price-label">قیمت کل پرایمر:</span>
-      <span class="price-value">${formatNumber(totalPrice)} ریال</span>
-    </div>
-  `;
+  // به روز رسانی نمایش قیمت ها بدون بازنویسی کل HTML
+  updatePrimerPriceDisplay(unitsNeeded, unitPrice, totalPrice);
 
   return totalPrice;
+
+  // تابع داخلی برای به روز رسانی نمایش قیمت ها
+  function updatePrimerPriceDisplay() {
+    // دریافت مقدار جدید از فیلد دستی اگر وجود داشته باشد
+    const manualField = document.getElementById("manualPrimerCount");
+    const currentUnits =
+      showManualInput && manualField
+        ? parseInt(manualField.value) || 1
+        : unitsNeeded;
+
+    const currentPrice = primerInfo.price * currentUnits;
+
+    // چک کنیم آیا المان های نمایش قیمت وجود دارند
+    let priceDisplay = document.getElementById("primerUnitCount");
+    if (!priceDisplay) {
+      // اگر المان های نمایش قیمت وجود ندارند، آنها را ایجاد کنیم
+      const priceContainer = document.createElement("div");
+      priceContainer.id = "primerPriceContainer";
+      priceContainer.innerHTML = `
+        <div class="price-item">
+          <span class="price-label">تعداد پرایمر مورد نیاز:</span>
+          <span class="price-value" id="primerUnitCount">${currentUnits} عدد</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">قیمت هر واحد:</span>
+          <span class="price-value">${formatNumber(
+            primerInfo.price
+          )} ریال</span>
+        </div>
+        <div class="price-item total-price-item">
+          <span class="price-label">قیمت کل پرایمر:</span>
+          <span class="price-value" id="primerTotalPrice">${formatNumber(
+            currentPrice
+          )} ریال</span>
+        </div>
+      `;
+      primerResultBox.appendChild(priceContainer);
+    } else {
+      // اگر المان های نمایش قیمت وجود دارند، فقط مقادیر را به روز کنیم
+      document.getElementById(
+        "primerUnitCount"
+      ).textContent = `${currentUnits} عدد`;
+      document.getElementById("primerTotalPrice").textContent = `${formatNumber(
+        currentPrice
+      )} ریال`;
+    }
+
+    // محاسبه مجدد قیمت کل بدون بازنویسی کل صفحه
+    const pipe1Price = document.getElementById("enable1").checked
+      ? calculatePipePrice(1)
+      : 0;
+    const pipe2Price = document.getElementById("enable2").checked
+      ? calculatePipePrice(2)
+      : 0;
+    const insulationPrice = document.getElementById("enableInsulation").checked
+      ? calculateInsulationPrice()
+      : 0;
+
+    // محاسبه قیمت کل
+    const totalAllPrice =
+      pipe1Price + pipe2Price + insulationPrice + currentPrice;
+
+    // نمایش قیمت کل
+    document.getElementById("totalPrice").textContent = `جمع کل: ${formatNumber(
+      totalAllPrice
+    )} ریال`;
+
+    // ذخیره مقادیر در حافظه محلی
+    saveToLocalStorage();
+
+    return currentPrice;
+  }
 }
 
 // تابع تبدیل تاریخ میلادی به شمسی
@@ -505,8 +651,30 @@ function shareResults() {
 
   if (enablePrimer && primerType !== "-") {
     const primerInfo = primerPrices[primerType];
-    const totalLength = parseFloat(length1) + parseFloat(length2);
-    primerCount = Math.ceil(totalLength / primerInfo.perLength);
+
+    // بررسی حالت های مختلف متراژ
+    if (
+      enable1 &&
+      enable2 &&
+      parseFloat(length1) > 0 &&
+      parseFloat(length2) > 0
+    ) {
+      if (parseFloat(length1) === parseFloat(length2)) {
+        // اگر متراژها یکسان هستند، فقط یکی را حساب کن
+        primerCount = Math.ceil(parseFloat(length1) / primerInfo.perLength);
+      } else {
+        // اگر متراژها متفاوت هستند، از مقدار فیلد دستی استفاده کن
+        const manualField = document.getElementById("manualPrimerCount");
+        primerCount = manualField ? parseInt(manualField.value) || 1 : 1;
+      }
+    } else if (enable1 && parseFloat(length1) > 0) {
+      // فقط لوله 1 فعال است
+      primerCount = Math.ceil(parseFloat(length1) / primerInfo.perLength);
+    } else if (enable2 && parseFloat(length2) > 0) {
+      // فقط لوله 2 فعال است
+      primerCount = Math.ceil(parseFloat(length2) / primerInfo.perLength);
+    }
+
     totalPrimerPrice = primerCount * primerInfo.price;
   }
 
