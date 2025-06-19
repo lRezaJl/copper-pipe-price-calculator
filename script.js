@@ -12,10 +12,10 @@ const weights = {
 
 // قیمت‌های پرایمر
 const primerPrices = {
-  high: { price: 1100000, perLength: 5 }, // پرایمر دور بالا
-  low: { price: 800000, perLength: 3 }, // پرایمر دور پایین
-  tableHigh: { price: 700000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
-  tableLow: { price: 500000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
+  high: { price: 1200000, perLength: 5 }, // پرایمر دور بالا
+  low: { price: 1000000, perLength: 3 }, // پرایمر دور پایین
+  tableHigh: { price: 900000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
+  tableLow: { price: 700000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
 };
 
 // همگام سازی متراژ بین لوله‌ها
@@ -158,10 +158,10 @@ function calculateInsulationPrice() {
 
   // قیمت‌های پایه عایق بر اساس سایز
   const insulationBasePrice = {
-    "1/4": 350000,
-    "3/8": 440000,
-    "1/2": 520000,
-    "5/8": 580000,
+    "1/4": 500000,
+    "3/8": 620000,
+    "1/2": 750000,
+    "5/8": 830000,
   };
 
   // محاسبه برای حالت‌های مختلف
@@ -562,10 +562,10 @@ function shareResults() {
 
   // قیمت‌های پایه عایق بر اساس سایز
   const insulationBasePrice = {
-    "1/4": 430000,
-    "3/8": 530000,
+    "1/4": 500000,
+    "3/8": 620000,
     "1/2": 630000,
-    "5/8": 710000,
+    "5/8": 830000,
   };
 
   // محاسبه تعداد و قیمت کل عایق
@@ -896,7 +896,7 @@ function loadFromLocalStorage() {
 // اجرای محاسبه اولیه و بارگذاری اطلاعات ذخیره شده هنگام بارگذاری صفحه
 document.addEventListener("DOMContentLoaded", function () {
   // تنظیم مقدار پیش‌فرض برای قیمت واحد
-  document.getElementById("unitPrice").value = "16000000";
+  document.getElementById("unitPrice").value = "15500000";
 
   // بارگذاری اطلاعات ذخیره شده
   loadFromLocalStorage();
