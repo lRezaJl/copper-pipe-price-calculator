@@ -13,7 +13,7 @@ const weights = {
 // قیمت‌های پرایمر
 const primerPrices = {
   high: { price: 1200000, perLength: 5 }, // پرایمر دور بالا
-  low: { price: 1000000, perLength: 3 }, // پرایمر دور پایین
+  low: { price: 900000, perLength: 3 }, // پرایمر دور پایین
   tableHigh: { price: 900000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
   tableLow: { price: 700000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
 };
@@ -564,7 +564,7 @@ function shareResults() {
   const insulationBasePrice = {
     "1/4": 500000,
     "3/8": 620000,
-    "1/2": 630000,
+    "1/2": 750000,
     "5/8": 830000,
   };
 
