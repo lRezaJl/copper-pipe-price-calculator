@@ -158,10 +158,10 @@ function calculateInsulationPrice() {
 
   // قیمت‌های پایه عایق بر اساس سایز
   const insulationBasePrice = {
-    "1/4": 500000,
+    "1/4": 480000,
     "3/8": 600000,
     "1/2": 750000,
-    "5/8": 850000,
+    "5/8": 800000,
   };
 
   // محاسبه برای حالت‌های مختلف
@@ -759,7 +759,7 @@ function showToast(message) {
 // پاک کردن تمام فرم‌ها
 function resetForm() {
   // پاک کردن ورودی‌های مشترک
-  document.getElementById("unitPrice").value = "16000000";
+  document.getElementById("unitPrice").value = "19000000";
 
   // فعال کردن تمام بخش‌ها
   document.getElementById("enable1").checked = true;
