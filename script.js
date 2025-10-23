@@ -12,10 +12,10 @@ const weights = {
 
 // قیمت‌های پرایمر
 const primerPrices = {
-  high: { price: 1200000, perLength: 5 }, // پرایمر دور بالا
-  low: { price: 900000, perLength: 3 }, // پرایمر دور پایین
-  tableHigh: { price: 900000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
-  tableLow: { price: 700000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
+  high: { price: 1250000, perLength: 5 }, // پرایمر دور بالا
+  low: { price: 1100000, perLength: 3 }, // پرایمر دور پایین
+  tableHigh: { price: 1000000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
+  tableLow: { price: 800000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
 };
 
 // همگام سازی متراژ بین لوله‌ها
