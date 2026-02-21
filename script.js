@@ -12,10 +12,10 @@ const weights = {
 
 // قیمت‌های پرایمر
 const primerPrices = {
-  high: { price: 1250000, perLength: 5 }, // پرایمر دور بالا
-  low: { price: 1100000, perLength: 3 }, // پرایمر دور پایین
-  tableHigh: { price: 1000000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
-  tableLow: { price: 800000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
+  high: { price: 1850000, perLength: 5 }, // پرایمر دور بالا
+  low: { price: 1200000, perLength: 3 }, // پرایمر دور پایین
+  tableHigh: { price: 1100000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
+  tableLow: { price: 900000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
 };
 
 // همگام سازی متراژ بین لوله‌ها
@@ -65,7 +65,7 @@ function calculatePrice() {
 
   // نمایش قیمت کل
   document.getElementById("totalPrice").textContent = `جمع کل: ${formatNumber(
-    totalPrice
+    totalPrice,
   )} ریال`;
 
   // ذخیره مقادیر در حافظه محلی
@@ -158,10 +158,10 @@ function calculateInsulationPrice() {
 
   // قیمت‌های پایه عایق بر اساس سایز
   const insulationBasePrice = {
-    "1/4": 500000,
-    "3/8": 600000,
-    "1/2": 750000,
-    "5/8": 850000,
+    "1/4": 550000,
+    "3/8": 670000,
+    "1/2": 800000,
+    "5/8": 890000,
   };
 
   // محاسبه برای حالت‌های مختلف
@@ -320,7 +320,7 @@ function calculatePrimerPrice() {
 
       // اگر فیلد دستی وجود دارد، آن را حذف کنیم
       const manualInputContainer = document.getElementById(
-        "manualInputContainer"
+        "manualInputContainer",
       );
       if (manualInputContainer) {
         manualInputContainer.style.display = "none";
@@ -331,7 +331,7 @@ function calculatePrimerPrice() {
 
       // چک کنیم آیا فیلد دستی وجود دارد
       let manualInputContainer = document.getElementById(
-        "manualInputContainer"
+        "manualInputContainer",
       );
 
       if (!manualInputContainer) {
@@ -348,7 +348,7 @@ function calculatePrimerPrice() {
         if (primerResultBox.firstChild) {
           primerResultBox.insertBefore(
             manualInputContainer,
-            primerResultBox.firstChild
+            primerResultBox.firstChild,
           );
         } else {
           primerResultBox.appendChild(manualInputContainer);
@@ -378,7 +378,7 @@ function calculatePrimerPrice() {
 
     // اگر فیلد دستی وجود دارد، آن را مخفی کنیم
     const manualInputContainer = document.getElementById(
-      "manualInputContainer"
+      "manualInputContainer",
     );
     if (manualInputContainer) {
       manualInputContainer.style.display = "none";
@@ -389,7 +389,7 @@ function calculatePrimerPrice() {
 
     // اگر فیلد دستی وجود دارد، آن را مخفی کنیم
     const manualInputContainer = document.getElementById(
-      "manualInputContainer"
+      "manualInputContainer",
     );
     if (manualInputContainer) {
       manualInputContainer.style.display = "none";
@@ -429,24 +429,23 @@ function calculatePrimerPrice() {
         <div class="price-item">
           <span class="price-label">قیمت هر واحد:</span>
           <span class="price-value">${formatNumber(
-            primerInfo.price
+            primerInfo.price,
           )} ریال</span>
         </div>
         <div class="price-item total-price-item">
           <span class="price-label">قیمت کل پرایمر:</span>
           <span class="price-value" id="primerTotalPrice">${formatNumber(
-            currentPrice
+            currentPrice,
           )} ریال</span>
         </div>
       `;
       primerResultBox.appendChild(priceContainer);
     } else {
       // اگر المان های نمایش قیمت وجود دارند، فقط مقادیر را به روز کنیم
-      document.getElementById(
-        "primerUnitCount"
-      ).textContent = `${currentUnits} عدد`;
+      document.getElementById("primerUnitCount").textContent =
+        `${currentUnits} عدد`;
       document.getElementById("primerTotalPrice").textContent = `${formatNumber(
-        currentPrice
+        currentPrice,
       )} ریال`;
     }
 
@@ -467,7 +466,7 @@ function calculatePrimerPrice() {
 
     // نمایش قیمت کل
     document.getElementById("totalPrice").textContent = `جمع کل: ${formatNumber(
-      totalAllPrice
+      totalAllPrice,
     )} ریال`;
 
     // ذخیره مقادیر در حافظه محلی
@@ -510,7 +509,7 @@ function shareResults() {
   const jalaliDate = gregorianToJalali(
     today.getFullYear(),
     today.getMonth() + 1,
-    today.getDate()
+    today.getDate(),
   );
   const dateFormatted = `${jalaliDate[0]}/${jalaliDate[1]}/${jalaliDate[2]}`;
 
@@ -562,9 +561,9 @@ function shareResults() {
 
   // قیمت‌های پایه عایق بر اساس سایز
   const insulationBasePrice = {
-    "1/4": 500000,
+    "1/4": 550000,
     "3/8": 620000,
-    "1/2": 750000,
+    "1/2": 800000,
     "5/8": 830000,
   };
 
@@ -578,7 +577,7 @@ function shareResults() {
       length1 === length2 || length1 === "0" || length2 === "0";
     const effectiveLength = Math.max(
       parseFloat(length1) || 0,
-      parseFloat(length2) || 0
+      parseFloat(length2) || 0,
     );
 
     if (
@@ -597,7 +596,7 @@ function shareResults() {
         totalInsulationPrice = pairPrice * pairsNeeded;
 
         insulationInfo = `عایق ${size1} و ${size2}  |  ${pairsNeeded} جفت  |  ${formatNumber(
-          pairPrice
+          pairPrice,
         )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
       } else if (parseFloat(length1) > 0 && parseFloat(length2) > 0) {
         // اگر متراژها متفاوت باشند، دو محاسبه جداگانه انجام می‌دهیم
@@ -613,10 +612,10 @@ function shareResults() {
 
         insulationInfo =
           `عایق ${size1}  |  ${pairs1Needed} عدد  |  ${formatNumber(
-            price1
+            price1,
           )} ریال  |  ${formatNumber(totalPrice1)} ریال\n` +
           `عایق ${size2}  |  ${pairs2Needed} عدد  |  ${formatNumber(
-            price2
+            price2,
           )} ریال  |  ${formatNumber(totalPrice2)} ریال`;
       }
     } else if (enable1 && size1 !== "-" && parseFloat(length1) > 0) {
@@ -625,7 +624,7 @@ function shareResults() {
       const price = insulationBasePrice[size1] || 0;
       totalInsulationPrice = price * pairsNeeded;
       insulationInfo = `عایق ${size1}  |  ${pairsNeeded} عدد  |  ${formatNumber(
-        price
+        price,
       )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
     } else if (enable2 && size2 !== "-" && parseFloat(length2) > 0) {
       // فقط لوله 2 فعال است
@@ -633,7 +632,7 @@ function shareResults() {
       const price = insulationBasePrice[size2] || 0;
       totalInsulationPrice = price * pairsNeeded;
       insulationInfo = `عایق ${size2}  |  ${pairsNeeded} عدد  |  ${formatNumber(
-        price
+        price,
       )} ریال  |  ${formatNumber(totalInsulationPrice)} ریال`;
     }
   }
@@ -687,13 +686,13 @@ function shareResults() {
 
   if (enable1 && size1 !== "-" && length1 !== "0") {
     invoiceText += `لوله سایز ${size1} - ضخامت ${thickness1}  |  ${length1} متر  |  ${formatNumber(
-      pipe1PricePerMeter
+      pipe1PricePerMeter,
     )} ریال  |  ${formatNumber(pipe1TotalPrice)} ریال\n`;
   }
 
   if (enable2 && size2 !== "-" && length2 !== "0") {
     invoiceText += `لوله سایز ${size2} - ضخامت ${thickness2}  |  ${length2} متر  |  ${formatNumber(
-      pipe2PricePerMeter
+      pipe2PricePerMeter,
     )} ریال  |  ${formatNumber(pipe2TotalPrice)} ریال\n`;
   }
 
@@ -703,7 +702,7 @@ function shareResults() {
 
   if (enablePrimer && primerType !== "-") {
     invoiceText += `\nپرایمر ${primerTypeText}  |  ${primerCount} عدد  |  ${formatNumber(
-      totalPrimerPrice
+      totalPrimerPrice,
     )} ریال\n`;
   }
 
@@ -712,7 +711,7 @@ function shareResults() {
   // بررسی اینکه آیا موبایل است یا دسکتاپ
   const isMobile =
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
+      navigator.userAgent,
     );
 
   // اشتراک گذاری متن فاکتور
@@ -896,7 +895,7 @@ function loadFromLocalStorage() {
 // اجرای محاسبه اولیه و بارگذاری اطلاعات ذخیره شده هنگام بارگذاری صفحه
 document.addEventListener("DOMContentLoaded", function () {
   // تنظیم مقدار پیش‌فرض برای قیمت واحد
-  document.getElementById("unitPrice").value = "15500000";
+  document.getElementById("unitPrice").value = "15550000";
 
   // بارگذاری اطلاعات ذخیره شده
   loadFromLocalStorage();
