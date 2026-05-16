@@ -12,10 +12,18 @@ const weights = {
 
 // قیمت‌های پرایمر
 const primerPrices = {
-  high: { price: 1850000, perLength: 5 }, // پرایمر دور بالا
-  low: { price: 1200000, perLength: 3 }, // پرایمر دور پایین
-  tableHigh: { price: 1100000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
-  tableLow: { price: 900000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
+  high: { price: 2500000, perLength: 5 }, // پرایمر دور بالا
+  low: { price: 2000000, perLength: 3 }, // پرایمر دور پایین
+  tableHigh: { price: 1500000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
+  tableLow: { price: 1200000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
+};
+
+// قیمت‌های پایه عایق بر اساس سایز
+const insulationBasePrice = {
+  "1/4": 670000,
+  "3/8": 840000,
+  "1/2": 1000000,
+  "5/8": 1110000,
 };
 
 // همگام سازی متراژ بین لوله‌ها
@@ -155,14 +163,6 @@ function calculateInsulationPrice() {
     insulationResultBox.innerHTML = "<p>لطفاً سایز لوله‌ها را انتخاب کنید.</p>";
     return 0;
   }
-
-  // قیمت‌های پایه عایق بر اساس سایز
-  const insulationBasePrice = {
-    "1/4": 550000,
-    "3/8": 670000,
-    "1/2": 800000,
-    "5/8": 890000,
-  };
 
   // محاسبه برای حالت‌های مختلف
   let totalPrice = 0;
@@ -558,14 +558,6 @@ function shareResults() {
     pipe2PricePerMeter = (weight2 * unitPrice) / 50;
     pipe2TotalPrice = pipe2PricePerMeter * length2;
   }
-
-  // قیمت‌های پایه عایق بر اساس سایز
-  const insulationBasePrice = {
-    "1/4": 550000,
-    "3/8": 620000,
-    "1/2": 800000,
-    "5/8": 830000,
-  };
 
   // محاسبه تعداد و قیمت کل عایق
   let insulationInfo = "";
