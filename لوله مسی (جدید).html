@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ماشین حساب قیمت لوله مسی</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Tahoma, Arial, sans-serif;
+        text-align: center;
+        background-color: #eef2f3;
+        margin: 0;
+        padding: 10px;
+        direction: rtl;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .calculator,
+      .shared-inputs {
+        width: 100%;
+        padding: 15px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .shared-inputs {
+        background-color: #e3f2fd;
+      }
+      label {
+        font-weight: bold;
+        display: block;
+        margin-top: 10px;
+        text-align: right;
+      }
+      select,
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .result-box {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: right;
+      }
+      .result {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #2c3e50;
+        text-align: right;
+      }
+      .total {
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #007bff;
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      h3 {
+        margin-top: 0;
+        color: #0056b3;
+      }
+      .header {
+        background-color: #0056b3;
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .btn-reset {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+      }
+      .btn-reset:hover {
+        background-color: #c82333;
+      }
+
+      /* برای صفحه نمایش‌های بزرگتر */
+      @media (min-width: 768px) {
+        .container {
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: space-between;
+        }
+        .shared-inputs {
+          width: 100%;
+        }
+        .calculator {
+          width: calc(50% - 10px);
+        }
+      }
+
+      /* برای صفحه نمایش‌های خیلی بزرگ */
+      @media (min-width: 1024px) {
+        .calculator {
+          width: calc(33% - 10px);
+        }
+      }
+
+      .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>ماشین حساب قیمت لوله مسی</h1>
+    </div>
+
+    <div class="container">
+      <div class="shared-inputs">
+        <label>متراژ:</label>
+        <input
+          type="number"
+          id="length"
+          placeholder="متراژ را وارد کنید"
+          oninput="updateAll()"
+        />
+        <label>قیمت واحد (ریال):</label>
+        <input
+          type="number"
+          id="unitPrice"
+          placeholder="قیمت واحد را وارد کنید"
+          oninput="updateAll()"
+        />
+        <button class="btn-reset" onclick="resetForm()">پاک کردن همه</button>
+      </div>
+
+      <div class="calculator">
+        <h3>محاسبه قیمت ۱</h3>
+        <label>سایز:</label>
+        <select id="size1" onchange="updateAll()">
+          <option value="1/4">1/4</option>
+          <option value="3/8">3/8</option>
+          <option value="1/2">1/2</option>
+          <option value="5/8">5/8</option>
+        </select>
+        <label>ضخامت:</label>
+        <select id="thickness1" onchange="updateAll()">
+          <option value="0.25">0.25</option>
+          <option value="0.30">0.30</option>
+        </select>
+        <div class="result" id="output1"></div>
+      </div>
+
+      <div class="calculator">
+        <h3>محاسبه قیمت ۲</h3>
+        <label>سایز:</label>
+        <select id="size2" onchange="updateAll()">
+          <option value="1/4">1/4</option>
+          <option value="3/8">3/8</option>
+          <option value="1/2">1/2</option>
+          <option value="5/8">5/8</option>
+        </select>
+        <label>ضخامت:</label>
+        <select id="thickness2" onchange="updateAll()">
+          <option value="0.25">0.25</option>
+          <option value="0.30">0.30</option>
+        </select>
+        <div class="result" id="output2"></div>
+      </div>
+
+      <div class="calculator">
+        <h3>محاسبه عایق</h3>
+        <div class="result-box">
+          <p>تعداد عایق: <span id="insulation-count">0</span></p>
+          <p>قیمت یک جفت عایق: <span id="pair-price">0</span> ريال</p>
+          <p>قیمت کل عایق ها: <span id="total-price">0</span> ريال</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="total" id="totalPrice">جمع کل: 0 ریال</div>
+
+    <div class="footer">ماشین حساب قیمت لوله مسی - نسخه ۱.۱</div>
+
+    <script>
+      const weights = {
+        "1/4-0.25": 5.23,
+        "1/4-0.30": 5.95,
+        "3/8-0.25": 8.17,
+        "3/8-0.30": 9.5,
+        "1/2-0.25": 11.18,
+        "1/2-0.30": 12.86,
+        "5/8-0.25": 14.21,
+        "5/8-0.30": 16.28,
+      };
+
+      function calculatePrice(calculatorId) {
+        const length = parseFloat(document.getElementById("length").value) || 0;
+        const unitPrice =
+          parseFloat(document.getElementById("unitPrice").value) || 0;
+        const size = document.getElementById("size" + calculatorId).value;
+        const thickness = document.getElementById(
+          "thickness" + calculatorId
+        ).value;
+        const key = `${size}-${thickness}`;
+        const weight = weights[key] || 0;
+        const pricePerMeter = (weight * unitPrice) / 50;
+        const totalPrice = pricePerMeter * length;
+
+        document.getElementById(
+          "output" + calculatorId
+        ).innerHTML = `قیمت هر متر: ${Math.round(
+          pricePerMeter
+        ).toLocaleString()} ریال<br>
+           قیمت کل: ${Math.round(totalPrice).toLocaleString()} ریال`;
+
+        return totalPrice;
+      }
+
+      function calculateInsulation() {
+        const length = parseFloat(document.getElementById("length").value) || 0;
+        const pairsNeeded = Math.ceil(length / 1.8);
+        const price1 = {
+          "1/4": 350000,
+          "3/8": 440000,
+          "1/2": 520000,
+          "5/8": 580000,
+        }[document.getElementById("size1").value];
+        const price2 = {
+          "1/4": 350000,
+          "3/8": 440000,
+          "1/2": 520000,
+          "5/8": 580000,
+        }[document.getElementById("size2").value];
+        const pairPrice = price1 + price2;
+        const totalPrice = pairPrice * pairsNeeded;
+
+        document.getElementById("insulation-count").textContent = pairsNeeded;
+        document.getElementById("pair-price").textContent =
+          pairPrice.toLocaleString();
+        document.getElementById("total-price").textContent =
+          totalPrice.toLocaleString();
+        return totalPrice;
+      }
+
+      function updateAll() {
+        const total =
+          calculatePrice(1) + calculatePrice(2) + calculateInsulation();
+        document.getElementById(
+          "totalPrice"
+        ).textContent = `جمع کل: ${Math.round(total).toLocaleString()} ریال`;
+
+        // ذخیره مقادیر در localStorage
+        saveFormData();
+      }
+
+      function resetForm() {
+        document.getElementById("length").value = "";
+        document.getElementById("unitPrice").value = "";
+        document.getElementById("size1").selectedIndex = 0;
+        document.getElementById("thickness1").selectedIndex = 0;
+        document.getElementById("size2").selectedIndex = 0;
+        document.getElementById("thickness2").selectedIndex = 0;
+
+        document.getElementById("output1").innerHTML = "";
+        document.getElementById("output2").innerHTML = "";
+        document.getElementById("insulation-count").textContent = "0";
+        document.getElementById("pair-price").textContent = "0";
+        document.getElementById("total-price").textContent = "0";
+        document.getElementById("totalPrice").textContent = "جمع کل: 0 ریال";
+
+        // پاک کردن داده‌های ذخیره شده
+        localStorage.removeItem("calculatorFormData");
+      }
+
+      // ذخیره داده‌های فرم در localStorage
+      function saveFormData() {
+        const formData = {
+          length: document.getElementById("length").value,
+          unitPrice: document.getElementById("unitPrice").value,
+          size1: document.getElementById("size1").value,
+          thickness1: document.getElementById("thickness1").value,
+          size2: document.getElementById("size2").value,
+          thickness2: document.getElementById("thickness2").value,
+        };
+
+        localStorage.setItem("calculatorFormData", JSON.stringify(formData));
+      }
+
+      // بازیابی داده‌های فرم از localStorage
+      function loadFormData() {
+        const savedData = localStorage.getItem("calculatorFormData");
+
+        if (savedData) {
+          const formData = JSON.parse(savedData);
+
+          document.getElementById("length").value = formData.length || "";
+          document.getElementById("unitPrice").value = formData.unitPrice || "";
+
+          // تنظیم مقادیر select
+          const size1Select = document.getElementById("size1");
+          const thickness1Select = document.getElementById("thickness1");
+          const size2Select = document.getElementById("size2");
+          const thickness2Select = document.getElementById("thickness2");
+
+          if (formData.size1) {
+            for (let i = 0; i < size1Select.options.length; i++) {
+              if (size1Select.options[i].value === formData.size1) {
+                size1Select.selectedIndex = i;
+                break;
+              }
+            }
+          }
+
+          if (formData.thickness1) {
+            for (let i = 0; i < thickness1Select.options.length; i++) {
+              if (thickness1Select.options[i].value === formData.thickness1) {
+                thickness1Select.selectedIndex = i;
+                break;
+              }
+            }
+          }
+
+          if (formData.size2) {
+            for (let i = 0; i < size2Select.options.length; i++) {
+              if (size2Select.options[i].value === formData.size2) {
+                size2Select.selectedIndex = i;
+                break;
+              }
+            }
+          }
+
+          if (formData.thickness2) {
+            for (let i = 0; i < thickness2Select.options.length; i++) {
+              if (thickness2Select.options[i].value === formData.thickness2) {
+                thickness2Select.selectedIndex = i;
+                break;
+              }
+            }
+          }
+
+          // به‌روزرسانی محاسبات
+          updateAll();
+        }
+      }
+
+      // اجرای بازیابی داده‌ها هنگام بارگذاری صفحه
+      window.onload = function () {
+        loadFormData();
+      };
+    </script>
+  </body>
+</html>
