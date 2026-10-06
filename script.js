@@ -12,7 +12,7 @@ const weights = {
 
 // قیمت‌های پرایمر
 const primerPrices = {
-  high: { price: 4000000, perLength: 5 }, // پرایمر دور بالا
+  high: { price: 4050000, perLength: 5 }, // پرایمر دور بالا
   low: { price: 2500000, perLength: 3 }, // پرایمر دور پایین
   tableHigh: { price: 2000000, perLength: 5 }, // پرایمر سفره‌ای دور بالا
   tableLow: { price: 1700000, perLength: 3 }, // پرایمر سفره‌ای دور پایین
@@ -20,10 +20,10 @@ const primerPrices = {
 
 // قیمت‌های پایه عایق بر اساس سایز
 const insulationBasePrice = {
-  "1/4": 1000000,
-  "3/8": 1250000,
-  "1/2": 1500000,
-  "5/8": 1670000,
+  "1/4": 1070000,
+  "3/8": 1340000,
+  "1/2": 1600000,
+  "5/8": 1780000,
 };
 
 // همگام سازی متراژ بین لوله‌ها
@@ -750,7 +750,7 @@ function showToast(message) {
 // پاک کردن تمام فرم‌ها
 function resetForm() {
   // پاک کردن ورودی‌های مشترک
-  document.getElementById("unitPrice").value = "19000000";
+  document.getElementById("unitPrice").value = "53000000";
 
   // فعال کردن تمام بخش‌ها
   document.getElementById("enable1").checked = true;
