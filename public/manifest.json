@@ -2,7 +2,7 @@
   "name": "ماشین حساب قیمت لوله مسی",
   "short_name": "لوله مسی",
   "description": "ماشین حساب قیمت لوله مسی، عایق و پرایمر - فریزلند",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

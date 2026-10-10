@@ -8,15 +8,15 @@ importers:
 
   .:
     dependencies:
-      '@fontsource/vazirmatn':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@lucide/svelte':
         specifier: ^1.55.0
         version: 1.55.0(svelte@5.57.2)
       canvas-confetti:
         specifier: ^1.9.4
         version: 1.9.4
+      vazirmatn:
+        specifier: ^33.0.3
+        version: 33.0.3
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.3.0
@@ -539,9 +539,6 @@ packages:
   '@babel/types@7.29.8':
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
-
-  '@fontsource/vazirmatn@5.3.0':
-    resolution: {integrity: sha512-XC/2yN2r5gwhFT3klSuWaqncODX2DOfRYfNmbyzgtWYxHxMC+tcoaX+tgggrm6hSkEgpR1TuSDEf1PiI91G7qg==}
 
   '@isaacs/cliui@9.0.0':
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
@@ -1806,6 +1803,9 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  vazirmatn@33.0.3:
+    resolution: {integrity: sha512-fbjNc0CMjazZpIegWzz9OHGzI1APFboT+x7ZecXlUCtDe/nkyx7gtCTZnWS/+eeXG7fbfXymCPKJI8EsnM3iqw==}
+
   vite-plugin-pwa@2.0.0:
     resolution: {integrity: sha512-6G9dsPKT9QKYpeTuTLJM28zZL3HsXUTUM/QUZBEgQk2jbfrPJDq2i8gTewAKqi1c9Mt6MiidrL4SFI+HthiQMg==}
     engines: {node: '>=20.19.0'}
@@ -2615,8 +2615,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
-
-  '@fontsource/vazirmatn@5.3.0': {}
 
   '@isaacs/cliui@9.0.0': {}
 
@@ -3890,6 +3888,8 @@ snapshots:
       browserslist: 4.29.3
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  vazirmatn@33.0.3: {}
 
   vite-plugin-pwa@2.0.0(vite@8.3.4(terser@5.51.2))(workbox-build@7.4.1)(workbox-window@7.4.1):
     dependencies:

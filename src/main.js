@@ -1,10 +1,6 @@
 import { mount } from 'svelte'
-// فونت محلی وزیرمتن (بدون نیاز به اینترنت خارجی یا گوگل فونتز)
-import '@fontsource/vazirmatn/400.css'
-import '@fontsource/vazirmatn/500.css'
-import '@fontsource/vazirmatn/600.css'
-import '@fontsource/vazirmatn/700.css'
-import '@fontsource/vazirmatn/800.css'
+// لود فونت رسمی وزیرمتن نسخه اعداد فارسی (Vazirmatn FD) به صورت کاملاً محلی
+import 'vazirmatn/misc/Farsi-Digits/Vazirmatn-FD-font-face.css'
 import './app.css'
 import App from './App.svelte'
 
