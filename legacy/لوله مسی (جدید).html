@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -56,7 +56,6 @@
       }
       input[type="number"] {
         -moz-appearance: textfield;
-        appearance: textfield;
       }
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
@@ -243,15 +242,18 @@
           parseFloat(document.getElementById("unitPrice").value) || 0;
         const size = document.getElementById("size" + calculatorId).value;
         const thickness = document.getElementById(
-          "thickness" + calculatorId,
+          "thickness" + calculatorId
         ).value;
         const key = `${size}-${thickness}`;
         const weight = weights[key] || 0;
         const pricePerMeter = (weight * unitPrice) / 50;
         const totalPrice = pricePerMeter * length;
 
-        document.getElementById("output" + calculatorId).innerHTML =
-          `قیمت هر متر: ${Math.round(pricePerMeter).toLocaleString()} ریال<br>
+        document.getElementById(
+          "output" + calculatorId
+        ).innerHTML = `قیمت هر متر: ${Math.round(
+          pricePerMeter
+        ).toLocaleString()} ریال<br>
            قیمت کل: ${Math.round(totalPrice).toLocaleString()} ریال`;
 
         return totalPrice;
@@ -286,8 +288,9 @@
       function updateAll() {
         const total =
           calculatePrice(1) + calculatePrice(2) + calculateInsulation();
-        document.getElementById("totalPrice").textContent =
-          `جمع کل: ${Math.round(total).toLocaleString()} ریال`;
+        document.getElementById(
+          "totalPrice"
+        ).textContent = `جمع کل: ${Math.round(total).toLocaleString()} ریال`;
 
         // ذخیره مقادیر در localStorage
         saveFormData();

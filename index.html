@@ -2,256 +2,43 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ماشین حساب قیمت لوله مسی</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>ماشین حساب قیمت لوله مسی | فریزلنــد</title>
 
-    <!-- Favicon -->
+    <!-- Favicon & PWA Icons -->
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="icons/favicon-32x32.png"
+      href="/icons/favicon-32x32.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="icons/favicon-16x16.png"
+      href="/icons/favicon-16x16.png"
     />
-    <link rel="shortcut icon" href="icons/favicon.ico" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
 
-    <!-- تگ‌های PWA -->
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#1e88e5" />
+    <!-- Meta Tags -->
+    <meta name="theme-color" content="#0f172a" />
     <meta
       name="description"
-      content="ماشین حساب قیمت لوله مسی، عایق و پرایمر"
+      content="محاسبه‌گر حرفه‌ای و دقیق قیمت لوله مسی، عایق و پرایمر ویژه تاسیسات و برودت - فروشگاه فریزلند"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="لوله مسی" />
-    <link rel="apple-touch-icon" href="icons/icon-152x152.png" />
-
-    <link rel="stylesheet" href="styles.css" />
-    <!-- فونت‌های ایران سنس -->
-    <!-- <link
-      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css"
-      rel="stylesheet"
-      type="text/css"
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
     />
-    <link
-      href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css"
-      rel="stylesheet"
-      type="text/css"
-    /> -->
-    <!-- آیکون‌ها -->
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    /> -->
+    <meta name="apple-mobile-web-app-title" content="لوله مسی" />
   </head>
   <body>
-    <div class="header">
-      <h1>ماشین حساب قیمت لوله مسی</h1>
-    </div>
-
-    <div class="container">
-      <!-- بخش ورودی‌های مشترک -->
-      <div class="card shared-inputs">
-        <h3 class="section-title">ورودی‌های مشترک</h3>
-        <div class="input-group">
-          <label for="unitPrice">قیمت واحد (ریال):</label>
-          <input
-            type="number"
-            id="unitPrice"
-            placeholder="مثال: 53000000"
-            value="53000000"
-          />
-        </div>
-        <div class="button-group">
-          <button class="btn-reset" onclick="resetForm()">
-            <i class="fas fa-trash-alt"></i> پاک کردن همه
-          </button>
-          <button class="btn-share" onclick="shareResults()">
-            <i class="fas fa-share-alt"></i> اشتراک گذاری
-          </button>
-        </div>
-      </div>
-
-      <!-- بخش لوله 1 -->
-      <div class="calculator">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="section-title">لوله 1</h3>
-            <label class="switch">
-              <input
-                type="checkbox"
-                id="enable1"
-                checked
-                onchange="calculatePrice()"
-              />
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div class="input-group">
-            <label for="size1">سایز لوله:</label>
-            <select id="size1" onchange="calculatePrice()">
-              <option value="1/4" selected>1/4</option>
-              <option value="3/8">3/8</option>
-              <option value="1/2">1/2</option>
-              <option value="5/8">5/8</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="thickness1">ضخامت لوله:</label>
-            <select id="thickness1" onchange="calculatePrice()">
-              <option value="0.25" selected>0.25 میلیمتر</option>
-              <option value="0.30">0.30 میلیمتر</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="length1">متراژ (متر):</label>
-            <input
-              type="number"
-              id="length1"
-              placeholder="مثال: 10"
-              onchange="syncLengths(1)"
-              onkeyup="syncLengths(1)"
-            />
-          </div>
-          <div id="result1" class="result-box"></div>
-        </div>
-      </div>
-
-      <!-- بخش لوله 2 -->
-      <div class="calculator">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="section-title">لوله 2</h3>
-            <label class="switch">
-              <input
-                type="checkbox"
-                id="enable2"
-                checked
-                onchange="calculatePrice()"
-              />
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div class="input-group">
-            <label for="size2">سایز لوله:</label>
-            <select id="size2" onchange="calculatePrice()">
-              <option value="1/4">1/4</option>
-              <option value="3/8">3/8</option>
-              <option value="1/2">1/2</option>
-              <option value="5/8" selected>5/8</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="thickness2">ضخامت لوله:</label>
-            <select id="thickness2" onchange="calculatePrice()">
-              <option value="0.25" selected>0.25 میلیمتر</option>
-              <option value="0.30">0.30 میلیمتر</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="length2">متراژ (متر):</label>
-            <input
-              type="number"
-              id="length2"
-              placeholder="مثال: 10"
-              onchange="syncLengths(2)"
-              onkeyup="syncLengths(2)"
-            />
-          </div>
-          <div id="result2" class="result-box"></div>
-        </div>
-      </div>
-
-      <div class="calculator">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="section-title">محاسبه عایق</h3>
-            <label class="switch">
-              <input
-                type="checkbox"
-                id="enableInsulation"
-                checked
-                onchange="calculatePrice()"
-              />
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div id="insulationResult" class="result-box"></div>
-        </div>
-      </div>
-
-      <div class="calculator">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="section-title">محاسبه پرایمر</h3>
-            <label class="switch">
-              <input
-                type="checkbox"
-                id="enablePrimer"
-                checked
-                onchange="calculatePrice()"
-              />
-              <span class="slider round"></span>
-            </label>
-          </div>
-          <div class="input-group">
-            <label for="primerType">نوع پرایمر:</label>
-            <select id="primerType" onchange="calculatePrice()">
-              <option value="high">پرایمر دور بالا</option>
-              <option value="low">پرایمر دور پایین</option>
-              <option value="tableHigh">پرایمر سفره‌ای دور بالا</option>
-              <option value="tableLow">پرایمر سفره‌ای دور پایین</option>
-            </select>
-          </div>
-          <div id="primerResult" class="result-box"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="total card" id="totalPrice">جمع کل: 0 ریال</div>
-
-    <div class="share-container">
-      <button class="btn-share" onclick="shareResults()">
-        <i class="fas fa-share-alt"></i> اشتراک‌گذاری نتایج
-      </button>
-      <button class="btn-reset" onclick="resetForm()">
-        <i class="fas fa-trash-alt"></i> پاک کردن همه
-      </button>
-    </div>
-
-    <!-- توست نوتیفیکیشن -->
-    <div id="toast" class="toast">پیام در کلیپ‌بورد کپی شد!</div>
-
-    <div class="footer">
-      <p>ماشین حساب قیمت لوله مسی - نسخه 2.2.8</p>
-      <p>
-        قدرت گرفته از سایت
-        <a href="https://freezeland.shop" class="frezeld">فریزلنــد</a>
-      </p>
-    </div>
-
-    <script src="script.js"></script>
-
-    <!-- ثبت سرویس ورکر -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("sw.js")
-            .then((registration) => {
-              console.log("Service Worker ثبت شد:", registration);
-            })
-            .catch((error) => {
-              console.log("ثبت Service Worker با خطا مواجه شد:", error);
-            });
-        });
-      }
-    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

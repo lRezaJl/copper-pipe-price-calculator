@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@lucide/svelte@1.55.0'
