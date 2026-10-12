@@ -1,9 +1,17 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { VitePWA } from 'vite-plugin-pwa'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'node:path'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      $lib: path.resolve(import.meta.dirname, './src/lib'),
+    },
+  },
   plugins: [
+    tailwindcss(),
     svelte(),
     VitePWA({
       registerType: 'autoUpdate',

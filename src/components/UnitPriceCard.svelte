@@ -1,20 +1,20 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
   import { formatNumber } from '../lib/calculator.js';
-  import { Coins, RotateCcw, ChevronUp, ChevronDown, Plus, Minus } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { Badge } from '$lib/components/ui/badge';
+  import { Coins, RotateCcw, Plus, Minus } from '@lucide/svelte';
 
   const STEP = 500000; // گام ۵۰۰ هزار ریال
 
-  // مقدار نمایشی با جداکننده سه رقمی
   let displayValue = $state(formatNumber(store.unitPrice));
 
-  // همگام‌سازی دوطرفه با تغییرات store
   $effect(() => {
     displayValue = formatNumber(store.unitPrice);
   });
 
   function handleInput(e) {
-    // حذف تمام کاراکترهای غیرعددی (شامل کاما)
     const raw = e.target.value.replace(/[^0-9]/g, '');
     const num = raw ? parseInt(raw, 10) : 0;
     store.unitPrice = num;
@@ -51,217 +51,94 @@
   }
 </script>
 
-<div class="glass-card shared-card">
-  <div class="card-header">
-    <div class="card-title-group">
-      <div class="icon-badge">
-        <Coins size={20} />
+<div class="relative group">
+  <!-- گرادیان ملایم پشت کارت نرخ پایه -->
+  <div class="absolute -inset-0.5 bg-linear-to-r from-orange-500/20 via-amber-500/15 to-sky-500/20 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity"></div>
+
+  <div class="relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-5 sm:p-7 shadow-xl shadow-black/5 overflow-hidden">
+    <!-- نوار بالای کارت -->
+    <div class="absolute top-0 right-0 left-0 h-1 bg-linear-to-r from-orange-500 via-sky-500 to-amber-500"></div>
+
+    <!-- هدر کارت -->
+    <div class="flex items-center justify-between pb-4 border-b border-border/60 gap-3">
+      <div class="flex items-center gap-3">
+        <div class="size-10 sm:size-11 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/20 shadow-xs">
+          <Coins class="size-5 sm:size-6" />
+        </div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-foreground">قیمت واحد مس</h2>
+          <span class="text-xs text-muted-foreground block mt-0.5">
+            مبنای محاسبه نرخ لوله‌ها (به ازای هر کلاف ۵۰ متری استاندارد)
+          </span>
+        </div>
       </div>
-      <div>
-        <h2 class="card-title">قیمت واحد مس</h2>
-        <span class="card-subtitle">مبنای محاسبه نرخ لوله‌ها (به ازای هر کلاف ۵۰ متری استاندارد)</span>
-      </div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onclick={() => store.reset()}
+        title="پاک کردن تمام فرم‌ها"
+      >
+        <RotateCcw />
+        <span class="hidden sm:inline">پاک کردن فرم</span>
+      </Button>
     </div>
 
-    <div class="header-actions">
-      <button class="btn btn-ghost btn-sm reset-btn" onclick={() => store.reset()} title="پاک کردن تمام فرم‌ها">
-        <RotateCcw size={16} />
-        <span>پاک کردن فرم</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="input-section">
-    <div class="input-field">
-      <div class="label-row">
-        <label for="unit-price-input">نرخ واحد (ریال):</label>
-        <span class="step-hint">گام تغییر: ۵۰۰,۰۰۰ ریال</span>
+    <!-- بخش ورودی نرخ -->
+    <div class="pt-4 space-y-2.5">
+      <div class="flex items-center justify-between text-xs sm:text-sm">
+        <label for="unit-price-input" class="font-semibold text-foreground">
+          نرخ واحد (ریال):
+        </label>
+        <Badge variant="outline">
+          گام تغییر: ۵۰۰,۰۰۰ ریال
+        </Badge>
       </div>
-      <div class="input-wrapper-stepper">
+
+      <!-- استپر با کامپوننت‌های پیش‌فرض شادسی‌ان -->
+      <div class="flex items-center gap-2 sm:gap-2.5 w-full">
         <!-- دکمه کاهش ۵۰۰ هزار -->
-        <button
+        <Button
           type="button"
-          class="stepper-btn step-down"
+          variant="outline"
+          size="icon"
           onclick={stepDown}
           title="کاهش ۵۰۰,۰۰۰ ریال"
           aria-label="کاهش ۵۰۰ هزار ریال"
         >
-          <Minus size={18} />
-        </button>
+          <Minus />
+        </Button>
 
-        <div class="input-inner-box">
-          <input
+        <!-- فیلد ورودی عدد گلس‌مورفیک شادسی‌ان -->
+        <div class="relative flex-1 min-w-0">
+          <Input
             id="unit-price-input"
             type="text"
             inputmode="numeric"
-            class="custom-input unit-input"
+            class="text-center font-bold text-base sm:text-lg pl-12 pr-4 bg-background/40 backdrop-blur-sm"
             placeholder="مثال: 53,000,000"
             value={displayValue}
             oninput={handleInput}
             onkeydown={handleKeyDown}
           />
-          <span class="input-unit">ریال</span>
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
+            ریال
+          </span>
         </div>
 
         <!-- دکمه افزایش ۵۰۰ هزار -->
-        <button
+        <Button
           type="button"
-          class="stepper-btn step-up"
+          variant="outline"
+          size="icon"
           onclick={stepUp}
           title="افزایش ۵۰۰,۰۰۰ ریال"
           aria-label="افزایش ۵۰۰ هزار ریال"
         >
-          <Plus size={18} />
-        </button>
+          <Plus />
+        </Button>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-  .shared-card {
-    border-top: 3px solid var(--copper-500);
-  }
-
-  .icon-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: var(--radius-md);
-    background: var(--copper-glow);
-    color: var(--copper-500);
-  }
-
-  .card-subtitle {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    display: block;
-    margin-top: 2px;
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .btn-sm {
-    padding: 6px 12px;
-    font-size: 0.82rem;
-  }
-
-  .reset-btn {
-    color: var(--accent-rose);
-  }
-
-  .reset-btn:hover {
-    background: rgba(225, 29, 72, 0.1);
-  }
-
-  .input-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 6px;
-  }
-
-  .label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-
-  .label-row label {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
-
-  .step-hint {
-    font-size: 0.76rem;
-    font-weight: 500;
-    color: var(--text-muted);
-  }
-
-  .input-wrapper-stepper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .stepper-btn {
-    width: 46px;
-    height: 48px;
-    border-radius: var(--radius-md);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
-    flex-shrink: 0;
-  }
-
-  .stepper-btn:hover {
-    background: var(--ice-500);
-    border-color: var(--ice-500);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
-  }
-
-  .stepper-btn:active {
-    transform: scale(0.95);
-  }
-
-  .step-down:hover {
-    background: var(--copper-500);
-    border-color: var(--copper-500);
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
-  }
-
-  .input-inner-box {
-    position: relative;
-    flex: 1;
-    display: flex;
-    align-items: center;
-  }
-
-  .unit-input {
-    width: 100%;
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: var(--text-primary);
-    padding: 12px 16px;
-    padding-left: 50px;
-    text-align: right;
-    direction: ltr;
-  }
-
-  .input-unit {
-    position: absolute;
-    left: 16px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-
-  @media (max-width: 640px) {
-    .reset-btn span {
-      display: none;
-    }
-    .stepper-btn {
-      width: 42px;
-      height: 44px;
-    }
-    .unit-input {
-      font-size: 1.1rem;
-    }
-  }
-</style>

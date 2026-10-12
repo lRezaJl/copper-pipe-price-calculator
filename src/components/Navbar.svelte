@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { Button } from '$lib/components/ui/button';
   import { Sun, Moon, Flame, Snowflake, Download, Settings } from '@lucide/svelte';
 
   let { onOpenSettings } = $props();
@@ -8,16 +9,21 @@
   let deferredPrompt = $state(null);
   let canInstall = $state(false);
 
+  function applyTheme(dark) {
+    isDark = dark;
+    const theme = dark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', dark);
+    localStorage.setItem('theme', theme);
+  }
+
   onMount(() => {
-    // بررسی تم ترجیحی کاربر
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      isDark = true;
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
+    const initialDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    applyTheme(initialDark);
 
-    // بررسی رویداد نصب PWA
+    // رویداد نصب PWA
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -31,10 +37,7 @@
   });
 
   function toggleTheme() {
-    isDark = !isDark;
-    const theme = isDark ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    applyTheme(!isDark);
   }
 
   async function installApp() {
@@ -48,183 +51,75 @@
   }
 </script>
 
-<header class="navbar glass-card">
-  <div class="brand">
-    <div class="brand-icon">
-      <Flame size={20} class="icon-copper" />
-      <Snowflake size={18} class="icon-ice" />
+<div class="relative group">
+  <!-- گرادیان ملایم پشت هدر -->
+  <div class="absolute -inset-0.5 bg-linear-to-r from-orange-500/20 via-sky-500/15 to-amber-500/20 rounded-3xl blur-lg -z-10 opacity-70 group-hover:opacity-90 transition-opacity"></div>
+
+  <header class="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-card/70 dark:bg-card/50 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl shadow-lg shadow-black/5">
+    <!-- لوگو و برندینگ فریزلند -->
+    <div class="flex items-center gap-3.5">
+      <img
+        src="/FreezeLand-logo.png"
+        alt="لوگوی فریزلند"
+        class="size-10 sm:size-11 object-cover rounded-full shadow-sm"
+      />
+      <div>
+        <h1 class="text-base sm:text-lg font-black text-foreground tracking-tight">ماشین حساب قیمت لوله مسی</h1>
+        <a
+          href="https://freezeland.shop"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-xs text-muted-foreground hover:text-sky-500 transition-colors flex items-center gap-1"
+        >
+          <span>فروشگاه برودتی</span>
+          <span class="font-bold text-orange-500">فریزلند</span>
+        </a>
+      </div>
     </div>
-    <div class="brand-text">
-      <h1>ماشین حساب قیمت لوله مسی</h1>
-      <a href="https://freezeland.shop" target="_blank" rel="noopener noreferrer" class="brand-sub">
-        فروشگاه برودتی و تاسیساتی <span class="brand-highlight">فریزلنــد</span>
-      </a>
-    </div>
-  </div>
 
-  <div class="actions">
-    {#if canInstall}
-      <button class="btn btn-secondary install-btn" onclick={installApp} title="نصب اپلیکیشن روی دستگاه">
-        <Download size={17} />
-        <span>نصب PWA</span>
-      </button>
-    {/if}
-
-    {#if onOpenSettings}
-      <button
-        class="btn btn-ghost settings-nav-btn"
-        onclick={onOpenSettings}
-        title="تنظیمات مقادیر اولیه (وزن، عایق، پرایمر)"
-        aria-label="تنظیمات"
-      >
-        <Settings size={20} class="settings-nav-icon" />
-      </button>
-    {/if}
-
-    <button class="btn btn-ghost theme-btn" onclick={toggleTheme} title={isDark ? 'حالت روشن' : 'حالت تیره'}>
-      {#if isDark}
-        <Sun size={20} class="sun-icon" />
-      {:else}
-        <Moon size={20} class="moon-icon" />
+    <!-- اکشن‌های بالای هدر با استایل پیش‌فرض شادسی‌ان -->
+    <div class="flex items-center gap-2">
+      {#if canInstall}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onclick={installApp}
+          title="نصب اپلیکیشن روی دستگاه"
+        >
+          <Download />
+          <span class="hidden sm:inline">نصب PWA</span>
+        </Button>
       {/if}
-    </button>
-  </div>
-</header>
 
-<style>
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-  }
+      {#if onOpenSettings}
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onclick={onOpenSettings}
+          title="تنظیمات مقادیر اولیه (وزن، عایق، پرایمر)"
+          aria-label="تنظیمات"
+          class="max-sm:hidden"
+        >
+          <Settings />
+        </Button>
+      {/if}
 
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .brand-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(2, 132, 199, 0.15));
-    border: 1px solid var(--border-color);
-    position: relative;
-  }
-
-  :global(.icon-copper) {
-    color: var(--copper-500);
-    margin-left: -4px;
-  }
-
-  :global(.icon-ice) {
-    color: var(--ice-500);
-    margin-right: -4px;
-  }
-
-  .brand-text h1 {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1.3;
-  }
-
-  .brand-sub {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    display: block;
-    transition: var(--transition);
-  }
-
-  .brand-sub:hover {
-    color: var(--ice-500);
-  }
-
-  .brand-highlight {
-    font-weight: 700;
-    color: var(--copper-500);
-  }
-
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .install-btn {
-    padding: 8px 14px;
-    font-size: 0.85rem;
-  }
-
-  .theme-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-color);
-  }
-
-  .settings-nav-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    transition: var(--transition);
-  }
-
-  .settings-nav-btn:hover {
-    color: var(--copper-500);
-    border-color: var(--copper-500);
-    background: var(--copper-glow);
-  }
-
-  .settings-nav-btn:hover :global(.settings-nav-icon) {
-    transform: rotate(45deg);
-  }
-
-  :global(.settings-nav-icon) {
-    transition: transform 0.35s ease;
-  }
-
-  :global(.sun-icon) {
-    color: #f59e0b;
-  }
-
-  :global(.moon-icon) {
-    color: var(--ice-500);
-  }
-
-  @media (max-width: 640px) {
-    .navbar {
-      padding: 12px 14px;
-    }
-    .brand-text h1 {
-      font-size: 1rem;
-    }
-    .brand-sub {
-      font-size: 0.74rem;
-    }
-    .install-btn span {
-      display: none;
-    }
-    .install-btn {
-      padding: 8px;
-    }
-  }
-</style>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        onclick={toggleTheme}
+        title={isDark ? 'حالت روشن' : 'حالت تیره'}
+        aria-label="تغییر تم"
+      >
+        {#if isDark}
+          <Sun class="text-amber-400" />
+        {:else}
+          <Moon class="text-slate-700 dark:text-slate-300" />
+        {/if}
+      </Button>
+    </div>
+  </header>
+</div>

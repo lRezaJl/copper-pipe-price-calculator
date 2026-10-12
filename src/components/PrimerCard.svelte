@@ -1,19 +1,26 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
-  import { PRIMER_TYPES, formatNumber } from '../lib/calculator.js';
+  import { formatNumber } from '../lib/calculator.js';
+  import { Switch } from '$lib/components/ui/switch';
+  import { Input } from '$lib/components/ui/input';
+  import { Badge } from '$lib/components/ui/badge';
+  import * as Select from '$lib/components/ui/select';
   import { Package, Info } from '@lucide/svelte';
 
   const result = $derived(store.primerResult);
   const typesList = $derived(Object.values(store.settings.primerTypes));
+  const primerItems = $derived(
+    typesList.map((item) => ({
+      value: item.key,
+      label: `${item.label} (${formatNumber(item.price)} ریال - هر ${item.perLength} متر)`,
+    }))
+  );
 
-  function handleToggle(e) {
-    store.primer.enabled = e.target.checked;
-    store.saveToStorage();
-  }
-
-  function handleTypeChange(e) {
-    store.primer.type = e.target.value;
-    store.saveToStorage();
+  function handleTypeChange(val) {
+    if (val) {
+      store.primer.type = val;
+      store.saveToStorage();
+    }
   }
 
   function handleManualCount(e) {
@@ -23,158 +30,133 @@
   }
 </script>
 
-<div class="glass-card primer-card" class:disabled-card={!store.primer.enabled}>
-  <div class="card-header">
-    <div class="card-title-group">
-      <div class="icon-badge">
-        <Package size={20} />
-      </div>
-      <div>
-        <h3 class="card-title">محاسبه پرایمر</h3>
-        <span class="card-subtitle">چسب و عایق‌بندی تکمیلی لوله‌ها</span>
-      </div>
-    </div>
+<div class="relative group">
+  <!-- گرادیان ملایم پشت کارت پرایمر -->
+  <div class={`absolute -inset-0.5 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity ${store.primer.enabled ? 'bg-linear-to-br from-sky-500/25 via-sky-400/10 to-transparent' : 'bg-transparent'}`}></div>
 
-    <!-- سوئیچ فعال / غیرفعال سازی -->
-    <label class="toggle-switch" title={store.primer.enabled ? 'غیرفعال کردن' : 'فعال کردن'}>
-      <input type="checkbox" checked={store.primer.enabled} onchange={handleToggle} />
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
+  <div class={`relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-5 sm:p-7 shadow-xl shadow-black/5 transition-all duration-300 overflow-hidden flex flex-col justify-between ${!store.primer.enabled ? 'opacity-65' : ''}`}>
+    <div class={`absolute top-0 right-0 left-0 h-1.5 transition-colors ${store.primer.enabled ? 'bg-sky-500' : 'bg-muted'}`}></div>
 
-  {#if store.primer.enabled}
-    <div class="form-grid">
-      <!-- انتخاب نوع پرایمر -->
-      <div class="input-field" class:full-width={!result.isManual}>
-        <label for="primer-type-select">نوع پرایمر:</label>
-        <div class="input-wrapper">
-          <select id="primer-type-select" class="custom-select" value={store.primer.type} onchange={handleTypeChange}>
-            {#each typesList as item}
-              <option value={item.key}>
-                {item.label} ({formatNumber(item.price)} ریال - هر {item.perLength} متر)
-              </option>
-            {/each}
-          </select>
+    <div>
+      <!-- هدر پرایمر -->
+      <div class="flex items-center justify-between pb-4 border-b border-border/60 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="size-10 sm:size-11 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20 shadow-xs">
+            <Package class="size-5 sm:size-6" />
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-foreground">محاسبه پرایمر</h3>
+            <span class="text-xs text-muted-foreground block mt-0.5">
+              چسب و عایق‌بندی تکمیلی لوله‌ها
+            </span>
+          </div>
+        </div>
+
+        <!-- سوئیچ بدون بیرون‌زدگی دکمه در RTL -->
+        <div title={store.primer.enabled ? 'غیرفعال کردن' : 'فعال کردن'} class="shrink-0">
+          <Switch
+            bind:checked={store.primer.enabled}
+            onCheckedChange={(val) => {
+              store.primer.enabled = val;
+              store.saveToStorage();
+            }}
+            aria-label={store.primer.enabled ? 'غیرفعال کردن' : 'فعال کردن'}
+          />
         </div>
       </div>
 
-      <!-- فیلد دستی در صورت متراژهای نامساوی -->
-      {#if result.isManual}
-        <div class="input-field">
-          <label for="manual-count-input">تعداد پرایمر (متراژ متفاوت):</label>
-          <div class="input-wrapper">
-            <input
-              id="manual-count-input"
-              type="number"
-              min="1"
-              class="custom-input"
-              value={store.primer.manualCount}
-              oninput={handleManualCount}
-            />
-            <span class="input-unit">عدد</span>
+      {#if store.primer.enabled}
+        <div class="pt-4 space-y-3.5">
+          <!-- انتخاب نوع پرایمر -->
+          <div class="space-y-1.5">
+            <label for="primer-type-select" class="text-xs sm:text-sm font-semibold text-foreground block">
+              نوع پرایمر:
+            </label>
+            <Select.Root
+              type="single"
+              bind:value={store.primer.type}
+              items={primerItems}
+              onValueChange={handleTypeChange}
+            >
+              <Select.Trigger
+                id="primer-type-select"
+                class="w-full"
+              >
+                <Select.Value placeholder="انتخاب نوع پرایمر" />
+              </Select.Trigger>
+              <Select.Content>
+                {#each typesList as item}
+                  <Select.Item
+                    value={item.key}
+                    label={`${item.label} (${formatNumber(item.price)} ریال - هر ${item.perLength} متر)`}
+                    class="cursor-pointer"
+                  >
+                    {item.label} ({formatNumber(item.price)} ریال - هر {item.perLength} متر)
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
           </div>
+
+          <!-- فیلد دستی در صورت متراژهای نامساوی -->
+          {#if result.isManual}
+            <div class="space-y-1.5">
+              <label for="manual-count-input" class="text-xs sm:text-sm font-semibold text-foreground block">
+                تعداد پرایمر (متراژ متفاوت):
+              </label>
+              <div class="relative">
+                <Input
+                  id="manual-count-input"
+                  type="number"
+                  min="1"
+                  class="text-center font-bold text-base sm:text-lg pl-12 pr-4 bg-background/40 backdrop-blur-sm"
+                  value={store.primer.manualCount}
+                  oninput={handleManualCount}
+                />
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
+                  عدد
+                </span>
+              </div>
+            </div>
+          {/if}
+
+          {#if !result.valid}
+            <div class="flex items-center gap-2.5 p-3.5 rounded-2xl bg-muted/30 backdrop-blur-sm text-muted-foreground text-xs sm:text-sm border border-dashed border-border">
+              <Info class="size-4 shrink-0 text-sky-500" />
+              <span>لطفاً متراژ لوله‌ها را وارد کنید تا تعداد پرایمر مورد نیاز برآورد شود.</span>
+            </div>
+          {:else}
+            <!-- کادر نتایج پرایمر -->
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-muted/30 backdrop-blur-sm border border-white/20 dark:border-white/10 space-y-2.5 text-xs sm:text-sm">
+              {#if result.isManual}
+                <div class="flex items-center gap-2 text-xs text-sky-600 dark:text-sky-400 bg-sky-500/10 p-2.5 rounded-xl border border-sky-500/20">
+                  <Info class="size-3.5 text-sky-500 shrink-0" />
+                  <span>به دلیل تفاوت متراژ لوله‌ها، تعداد پرایمر به صورت دستی قابل تنظیم است.</span>
+                </div>
+              {/if}
+
+              <div class="flex items-center justify-between text-muted-foreground">
+                <span>تعداد مورد نیاز:</span>
+                <span class="font-bold text-foreground">{result.count} <small class="text-xs text-muted-foreground">عدد</small></span>
+              </div>
+
+              <div class="flex items-center justify-between text-muted-foreground">
+                <span>قیمت هر واحد:</span>
+                <span class="font-bold text-foreground">{formatNumber(result.primerInfo.price)} <small class="text-xs text-muted-foreground">ریال</small></span>
+              </div>
+
+              <div class="pt-2 border-t border-border/70 flex items-center justify-between">
+                <span class="font-bold text-foreground">قیمت کل پرایمر:</span>
+                <span class="text-sm sm:text-base font-extrabold text-sky-600 dark:text-sky-400">{formatNumber(result.totalPrice)} ریال</span>
+              </div>
+            </div>
+          {/if}
+        </div>
+      {:else}
+        <div class="py-8 text-center text-xs sm:text-sm text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border mt-4">
+          <p>محاسبه پرایمر غیرفعال شده است.</p>
         </div>
       {/if}
     </div>
-
-    {#if !result.valid}
-      <div class="info-box">
-        <Info size={16} />
-        <span>لطفاً متراژ لوله‌ها را وارد کنید تا تعداد پرایمر مورد نیاز برآورد شود.</span>
-      </div>
-    {:else}
-      <div class="calc-result-box">
-        {#if result.isManual}
-          <div class="manual-notice">
-            <Info size={14} />
-            <span>به دلیل تفاوت متراژ لوله‌ها، تعداد پرایمر به صورت دستی قابل تنظیم است.</span>
-          </div>
-        {/if}
-
-        <div class="result-row">
-          <span class="result-label">تعداد مورد نیاز:</span>
-          <span class="result-value">{result.count} <small>عدد</small></span>
-        </div>
-
-        <div class="result-row">
-          <span class="result-label">قیمت هر واحد:</span>
-          <span class="result-value">{formatNumber(result.primerInfo.price)} <small>ریال</small></span>
-        </div>
-
-        <div class="result-row highlight">
-          <span class="result-label">قیمت کل پرایمر:</span>
-          <span class="result-value">{formatNumber(result.totalPrice)} ریال</span>
-        </div>
-      </div>
-    {/if}
-  {:else}
-    <div class="disabled-placeholder">
-      <p>محاسبه پرایمر غیرفعال شده است.</p>
-    </div>
-  {/if}
+  </div>
 </div>
-
-<style>
-  .icon-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: var(--radius-md);
-    background: var(--copper-glow);
-    color: var(--copper-500);
-  }
-
-  .card-subtitle {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    display: block;
-    margin-top: 2px;
-  }
-
-  .disabled-card {
-    opacity: 0.65;
-    background: var(--bg-secondary);
-  }
-
-  .full-width {
-    grid-column: 1 / -1;
-  }
-
-  .info-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-secondary);
-    border: 1px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 14px;
-    margin-top: 14px;
-    font-size: 0.86rem;
-    color: var(--text-muted);
-  }
-
-  .manual-notice {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: var(--copper-500);
-    background: var(--copper-glow);
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 6px;
-  }
-
-
-
-  .disabled-placeholder {
-    padding: 20px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-  }
-</style>

@@ -9,6 +9,7 @@
   import SettingsModal from './components/SettingsModal.svelte';
   import Toast from './components/Toast.svelte';
   import Footer from './components/Footer.svelte';
+  import { Button } from '$lib/components/ui/button';
   import { Settings } from '@lucide/svelte';
 
   let isInvoiceModalOpen = $state(false);
@@ -23,123 +24,54 @@
   }
 </script>
 
-<main class="app-container">
-  <!-- هدر و تغییر تم / PWA / دکمه تنظیمات هدر -->
-  <Navbar onOpenSettings={openSettingsModal} />
+<div class="relative w-full min-h-screen overflow-x-hidden">
+  <!-- اورب‌ها و گرادیان‌های شناور پس‌زمینه برای عمق‌بخشی به گلس‌مورفیسم -->
+  <div class="fixed top-[-5%] right-[-10%] size-112 sm:size-144 rounded-full bg-linear-to-br from-sky-500/15 via-cyan-400/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
+  <div class="fixed top-[40%] left-[-15%] size-112 sm:size-160 rounded-full bg-linear-to-tr from-orange-500/15 via-amber-400/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[10%] size-104 sm:size-136 rounded-full bg-linear-to-tl from-emerald-500/15 via-sky-500/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
 
-  <!-- کارت قیمت پایه مس -->
-  <UnitPriceCard />
+  <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 relative z-10">
+    <!-- هدر و تغییر تم / PWA / دکمه تنظیمات -->
+    <Navbar onOpenSettings={openSettingsModal} />
 
-  <!-- بخش لوله‌ها به صورت گرید مدرن و ریسپانسیو -->
-  <div class="pipes-grid">
-    <PipeCard pipeNumber={1} />
-    <PipeCard pipeNumber={2} />
-  </div>
+    <!-- کارت نرخ پایه مس -->
+    <UnitPriceCard />
 
-  <!-- بخش عایق و پرایمر به صورت دو ستونه یا ردیفی -->
-  <div class="accessories-grid">
-    <InsulationCard />
-    <PrimerCard />
-  </div>
+    <!-- بخش لوله‌ها: در دسکتاپ دو ستونه با فضای کافی، در موبایل و تبلت تمام‌عرض -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+      <PipeCard pipeNumber={1} />
+      <PipeCard pipeNumber={2} />
+    </div>
 
-  <!-- خلاصه فاکتور و دکمه‌های اشتراک‌گذاری -->
-  <SummaryCard onOpenModal={openInvoiceModal} />
+    <!-- بخش عایق و پرایمر -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+      <InsulationCard />
+      <PrimerCard />
+    </div>
 
-  <!-- پاورقی -->
-  <Footer />
+    <!-- کارت جامع خلاصه فاکتور و اکشن‌های اشتراک‌گذاری -->
+    <SummaryCard onOpenModal={openInvoiceModal} />
 
-  <!-- دکمه شناور تنظیمات کنار صفحه -->
-  <button
-    type="button"
-    class="side-settings-btn"
-    onclick={openSettingsModal}
-    title="تنظیمات مقادیر اولیه (وزن، عایق و پرایمر)"
-    aria-label="تنظیمات اولیه"
-  >
-    <Settings size={20} class="gear-icon" />
-    <span class="btn-text">تنظیمات</span>
-  </button>
+    <!-- فوتر -->
+    <Footer />
 
-  <!-- مودال‌ها و اعلان توست -->
-  <InvoiceModal bind:isOpen={isInvoiceModalOpen} />
-  <SettingsModal bind:isOpen={isSettingsModalOpen} />
-  <Toast />
-</main>
+    <!-- دکمه شناور تنظیمات کنار صفحه با کامپوننت Button شادسی‌ان -->
+    <Button
+      type="button"
+      variant="outline"
+      size="lg"
+      class="fixed bottom-6 left-6 z-40 bg-card/75 dark:bg-card/60 backdrop-blur-xl border-white/20 dark:border-white/10 shadow-xl group gap-2 cursor-pointer"
+      onclick={openSettingsModal}
+      title="تنظیمات مقادیر اولیه (وزن، عایق و پرایمر)"
+      aria-label="تنظیمات اولیه"
+    >
+      <Settings class="text-orange-500 group-hover:rotate-60 transition-transform duration-300" />
+      <span>تنظیمات</span>
+    </Button>
 
-<style>
-  .pipes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 18px;
-  }
-
-  .accessories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 18px;
-  }
-
-  /* دکمه شناور تنظیمات کنار صفحه */
-  .side-settings-btn {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    z-index: 95;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 18px;
-    border-radius: var(--radius-full);
-    background: var(--bg-card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid var(--border-color);
-    color: var(--text-primary);
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow:
-      0 10px 25px -5px rgba(0, 0, 0, 0.15),
-      0 0 15px var(--copper-glow);
-    transition: var(--transition);
-  }
-
-  .side-settings-btn:hover {
-    transform: translateY(-2px);
-    border-color: var(--copper-500);
-    color: var(--copper-500);
-    box-shadow:
-      0 14px 28px -5px rgba(0, 0, 0, 0.22),
-      0 0 22px var(--copper-glow);
-  }
-
-  .side-settings-btn:hover :global(.gear-icon) {
-    transform: rotate(60deg);
-  }
-
-  .side-settings-btn:active {
-    transform: scale(0.95);
-  }
-
-  :global(.gear-icon) {
-    color: var(--copper-500);
-    transition: transform 0.4s ease;
-  }
-
-  @media (max-width: 720px) {
-    .pipes-grid,
-    .accessories-grid {
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .side-settings-btn {
-      bottom: 18px;
-      left: 16px;
-      padding: 10px 14px;
-      font-size: 0.85rem;
-    }
-  }
-</style>
+    <!-- مودال‌ها و اعلان توست -->
+    <InvoiceModal bind:isOpen={isInvoiceModalOpen} />
+    <SettingsModal bind:isOpen={isSettingsModalOpen} />
+    <Toast />
+  </main>
+</div>

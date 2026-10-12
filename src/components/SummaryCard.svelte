@@ -1,6 +1,8 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
   import { formatNumber } from '../lib/calculator.js';
+  import { Button } from '$lib/components/ui/button';
+  import { Badge } from '$lib/components/ui/badge';
   import { Share2, Copy, Eye, RotateCcw, Check, Sparkles } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
 
@@ -41,7 +43,7 @@
   function triggerConfetti() {
     try {
       confetti({
-        particleCount: 45,
+        particleCount: 50,
         spread: 60,
         origin: { y: 0.85 },
       });
@@ -49,198 +51,115 @@
   }
 </script>
 
-<div class="glass-card summary-card">
-  <div class="summary-top">
-    <div class="total-label-group">
-      <span class="total-badge">
-        <Sparkles size={14} /> جمع کل فاکتور
-      </span>
-      <div class="total-amounts">
-        <div class="rial-line">
-          <span class="total-number">{formatNumber(store.grandTotal)}</span>
-          <span class="unit-text">ریال</span>
+<div class="relative group">
+  <!-- گرادیان درخشان پشت کارت جمع کل فاکتور -->
+  <div class="absolute -inset-1 bg-linear-to-r from-orange-500/30 via-sky-500/25 to-emerald-500/30 rounded-3xl blur-2xl -z-10 opacity-75 group-hover:opacity-100 transition-opacity"></div>
+
+  <div class="relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl shadow-black/10 overflow-hidden space-y-6">
+    <!-- نوار گرادیان بالای کارت -->
+    <div class="absolute top-0 right-0 left-0 h-1.5 bg-linear-to-r from-orange-500 via-sky-500 to-emerald-500"></div>
+
+    <!-- بخش اصلی جمع کل و تفکیک اقلام -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-border/70">
+      <!-- مبلغ کل فاکتور -->
+      <div class="space-y-2">
+        <Badge variant="secondary" class="gap-1.5">
+          <Sparkles class="size-3.5 text-sky-500" />
+          <span>جمع کل فاکتور</span>
+        </Badge>
+
+        <div class="flex items-baseline gap-2.5 flex-wrap">
+          <span class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
+            {formatNumber(store.grandTotal)}
+          </span>
+          <span class="text-base sm:text-lg font-bold text-muted-foreground">ریال</span>
         </div>
+      </div>
+
+      <!-- ریز اقلام محاسبه‌شده با استفاده از کامپوننت Badge پیش‌فرض شادسی‌ان -->
+      <div class="flex flex-wrap gap-2 text-xs">
+        {#if store.pipe1Result.enabled && store.pipe1Result.totalPrice > 0}
+          <Badge variant="outline" class="gap-1.5 py-1 px-2.5">
+            <span class="text-muted-foreground font-normal">لوله ۱:</span>
+            <span class="font-bold">{formatNumber(store.pipe1Result.totalPrice)} ریال</span>
+          </Badge>
+        {/if}
+
+        {#if store.pipe2Result.enabled && store.pipe2Result.totalPrice > 0}
+          <Badge variant="outline" class="gap-1.5 py-1 px-2.5">
+            <span class="text-muted-foreground font-normal">لوله ۲:</span>
+            <span class="font-bold">{formatNumber(store.pipe2Result.totalPrice)} ریال</span>
+          </Badge>
+        {/if}
+
+        {#if store.insulationResult.enabled && store.insulationResult.totalPrice > 0}
+          <Badge variant="outline" class="gap-1.5 py-1 px-2.5">
+            <span class="text-muted-foreground font-normal">عایق:</span>
+            <span class="font-bold">{formatNumber(store.insulationResult.totalPrice)} ریال</span>
+          </Badge>
+        {/if}
+
+        {#if store.primerResult.enabled && store.primerResult.totalPrice > 0}
+          <Badge variant="outline" class="gap-1.5 py-1 px-2.5">
+            <span class="text-muted-foreground font-normal">پرایمر:</span>
+            <span class="font-bold">{formatNumber(store.primerResult.totalPrice)} ریال</span>
+          </Badge>
+        {/if}
       </div>
     </div>
 
-    <!-- ریز اقلام محاسبه‌شده -->
-    <div class="breakdown-pills">
-      {#if store.pipe1Result.enabled && store.pipe1Result.totalPrice > 0}
-        <div class="pill">
-          <span class="pill-title">لوله ۱:</span>
-          <span class="pill-val">{formatNumber(store.pipe1Result.totalPrice)} ریال</span>
-        </div>
-      {/if}
-      {#if store.pipe2Result.enabled && store.pipe2Result.totalPrice > 0}
-        <div class="pill">
-          <span class="pill-title">لوله ۲:</span>
-          <span class="pill-val">{formatNumber(store.pipe2Result.totalPrice)} ریال</span>
-        </div>
-      {/if}
-      {#if store.insulationResult.enabled && store.insulationResult.totalPrice > 0}
-        <div class="pill">
-          <span class="pill-title">عایق:</span>
-          <span class="pill-val">{formatNumber(store.insulationResult.totalPrice)} ریال</span>
-        </div>
-      {/if}
-      {#if store.primerResult.enabled && store.primerResult.totalPrice > 0}
-        <div class="pill">
-          <span class="pill-title">پرایمر:</span>
-          <span class="pill-val">{formatNumber(store.primerResult.totalPrice)} ریال</span>
-        </div>
-      {/if}
+    <!-- دکمه‌های اقدام شادسی‌ان بدون کلاس‌های تکراری اضافه -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <!-- دکمه اشتراک‌گذاری اصلی -->
+      <Button
+        type="button"
+        size="lg"
+        class="flex-1 font-bold shadow-lg shadow-primary/20 gap-2 cursor-pointer"
+        onclick={handleShare}
+      >
+        <Share2 />
+        <span>اشتراک‌گذاری فاکتور</span>
+      </Button>
+
+      <!-- دکمه کپی متن -->
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        onclick={handleCopy}
+      >
+        {#if copied}
+          <Check class="text-emerald-500" />
+          <span class="text-emerald-600 dark:text-emerald-400">کپی شد</span>
+        {:else}
+          <Copy />
+          <span>کپی متن</span>
+        {/if}
+      </Button>
+
+      <!-- دکمه مشاهده مودال فاکتور -->
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        onclick={onOpenModal}
+        title="پیش‌نمایش کامل"
+      >
+        <Eye />
+        <span>مشاهده</span>
+      </Button>
+
+      <!-- دکمه ریست فرم -->
+      <Button
+        type="button"
+        variant="outline"
+        size="icon-lg"
+        onclick={() => store.reset()}
+        title="شروع مجدد"
+        aria-label="شروع مجدد"
+      >
+        <RotateCcw />
+      </Button>
     </div>
   </div>
-
-  <div class="summary-actions">
-    <button class="btn btn-copper share-main-btn" onclick={handleShare}>
-      <Share2 size={18} />
-      <span>اشتراک‌گذاری فاکتور</span>
-    </button>
-
-    <button class="btn btn-secondary copy-btn" onclick={handleCopy}>
-      {#if copied}
-        <Check size={18} class="check-icon" />
-        <span>کپی شد</span>
-      {:else}
-        <Copy size={18} />
-        <span>کپی متن</span>
-      {/if}
-    </button>
-
-    <button class="btn btn-ghost preview-btn" onclick={onOpenModal} title="پیش‌نمایش کامل">
-      <Eye size={18} />
-      <span>مشاهده</span>
-    </button>
-
-    <button class="btn btn-ghost reset-btn" onclick={() => store.reset()} title="شروع مجدد">
-      <RotateCcw size={18} />
-    </button>
-  </div>
 </div>
-
-<style>
-  .summary-card {
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(234, 88, 12, 0.06)), var(--bg-card);
-    border: 1px solid rgba(2, 132, 199, 0.3);
-    box-shadow: var(--glow-shadow);
-  }
-
-  .summary-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .total-label-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .total-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--ice-600);
-  }
-
-  .rial-line {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-  }
-
-  .total-number {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--copper-500);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
-
-  .unit-text {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-  }
-
-
-  .breakdown-pills {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-end;
-  }
-
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg-secondary);
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    border: 1px solid var(--border-color);
-  }
-
-  .pill-title {
-    color: var(--text-muted);
-  }
-
-  .pill-val {
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .summary-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 18px;
-    flex-wrap: wrap;
-  }
-
-  .share-main-btn {
-    flex: 2;
-    min-width: 170px;
-  }
-
-  .copy-btn {
-    flex: 1;
-    min-width: 110px;
-  }
-
-  .preview-btn {
-    border: 1px solid var(--border-color);
-  }
-
-  .reset-btn {
-    color: var(--accent-rose);
-  }
-
-  :global(.check-icon) {
-    color: var(--accent-emerald);
-  }
-
-  @media (max-width: 640px) {
-    .summary-top {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .breakdown-pills {
-      align-items: flex-start;
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-    .total-number {
-      font-size: 1.8rem;
-    }
-  }
-</style>

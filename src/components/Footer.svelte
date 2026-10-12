@@ -2,67 +2,22 @@
   import { Heart, ExternalLink } from '@lucide/svelte';
 </script>
 
-<footer class="footer">
-  <div class="footer-content">
-    <p class="footer-title">ماشین حساب قیمت لوله مسی - نسخه ۳.۰ (Svelte 5 & Edge)</p>
-    <p class="footer-sub">
-      طراحی شده با
-      <Heart size={14} class="heart-icon" />
-      ویژه فروشگاه برودتی
-      <a href="https://freezeland.shop" target="_blank" rel="noopener noreferrer" class="frezeld-link">
-        فریزلنــد
-        <ExternalLink size={12} />
-      </a>
-    </p>
-  </div>
+<footer class="mt-8 pt-6 pb-16 border-t border-dashed border-border/70 text-center space-y-2">
+  <p class="text-xs font-medium text-muted-foreground">
+    ماشین حساب قیمت لوله مسی - نسخه ۳.۰ (Svelte 5 & Edge)
+  </p>
+  <p class="text-xs text-muted-foreground flex items-center justify-center gap-1.5 flex-wrap">
+    <span>طراحی شده با</span>
+    <Heart class="size-3.5 text-rose-500 fill-rose-500 inline-block animate-pulse" />
+    <span>ویژه فروشگاه برودتی</span>
+    <a
+      href="https://freezeland.shop"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-orange-500 hover:text-sky-500 dark:text-orange-400 font-bold inline-flex items-center gap-1 transition-colors"
+    >
+      <span>فریزلنــد</span>
+      <ExternalLink class="size-3" />
+    </a>
+  </p>
 </footer>
-
-<style>
-  .footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 20px 10px;
-    border-top: 1px dashed var(--border-color);
-  }
-
-  .footer-content {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .footer-title {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-
-  .footer-sub {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  :global(.heart-icon) {
-    color: var(--accent-rose);
-    fill: var(--accent-rose);
-  }
-
-  .frezeld-link {
-    color: var(--copper-500);
-    text-decoration: none;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: var(--transition);
-  }
-
-  .frezeld-link:hover {
-    color: var(--ice-500);
-    text-decoration: underline;
-  }
-</style>

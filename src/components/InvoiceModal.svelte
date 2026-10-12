@@ -1,6 +1,8 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
-  import { Copy, Check, MessageSquare, X, Share2 } from '@lucide/svelte';
+  import * as Dialog from '$lib/components/ui/dialog';
+  import { Button } from '$lib/components/ui/button';
+  import { Copy, Check, MessageSquare, Share2 } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
 
   let { isOpen = $bindable(false) } = $props();
@@ -14,7 +16,6 @@
       store.showToast("متن فاکتور با موفقیت در کلیپ‌بورد کپی شد!", "success");
       setTimeout(() => (copied = false), 2500);
     } catch (err) {
-      // روش سنتی پشتیبان
       const ta = document.createElement('textarea');
       ta.value = store.invoiceText;
       document.body.appendChild(ta);
@@ -47,132 +48,49 @@
   }
 </script>
 
-{#if isOpen}
-  <!-- Backdrop -->
-  <div class="modal-backdrop" onclick={close} onkeydown={(e) => e.key === 'Escape' && close()} role="presentation">
-    <div class="modal-content glass-card" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="-1">
-      <div class="modal-header">
-        <div class="modal-title-group">
-          <Share2 size={20} class="header-icon" />
-          <h3>پیش‌نمایش و اشتراک‌گذاری فاکتور</h3>
+<Dialog.Root bind:open={isOpen}>
+  <Dialog.Content class="sm:max-w-xl bg-card text-card-foreground border-border rounded-3xl p-6 shadow-2xl">
+    <Dialog.Header class="text-right space-y-1.5 pb-2 border-b border-border/70">
+      <div class="flex items-center gap-2.5">
+        <div class="size-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <Share2 class="size-4.5" />
         </div>
-        <button class="btn btn-ghost btn-icon close-btn" onclick={close}>
-          <X size={20} />
-        </button>
+        <div>
+          <Dialog.Title class="text-base font-bold text-foreground">پیش‌نمایش و اشتراک‌گذاری فاکتور</Dialog.Title>
+          <Dialog.Description class="sr-only">پیش‌نمایش و اشتراک‌گذاری فاکتور</Dialog.Description>
+        </div>
       </div>
+    </Dialog.Header>
 
-      <div class="invoice-body">
-        <pre class="invoice-pre">{store.invoiceText}</pre>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-copper copy-btn" onclick={handleCopy}>
-          {#if copied}
-            <Check size={18} />
-            <span>کپی شد!</span>
-          {:else}
-            <Copy size={18} />
-            <span>کپی در کلیپ‌بورد</span>
-          {/if}
-        </button>
-
-        <button class="btn btn-primary wa-btn" onclick={handleWhatsApp}>
-          <MessageSquare size={18} />
-          <span>ارسال در واتساپ</span>
-        </button>
-      </div>
+    <div class="py-3 max-h-[55vh] overflow-y-auto">
+      <pre class="bg-muted/40 border border-border/70 rounded-2xl p-4 text-xs leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground selection:bg-primary/20 select-text">{store.invoiceText}</pre>
     </div>
-  </div>
-{/if}
 
-<style>
-  .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    z-index: 999;
-  }
+    <Dialog.Footer class="pt-3 border-t border-border/70 flex flex-col sm:flex-row gap-2.5">
+      <Button
+        type="button"
+        variant="default"
+        class="flex-1 rounded-2xl font-bold gap-2 bg-linear-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-md shadow-orange-500/20"
+        onclick={handleCopy}
+      >
+        {#if copied}
+          <Check class="size-4" />
+          <span>کپی شد!</span>
+        {:else}
+          <Copy class="size-4" />
+          <span>کپی در کلیپ‌بورد</span>
+        {/if}
+      </Button>
 
-  .modal-content {
-    width: 100%;
-    max-width: 550px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-    display: flex;
-    flex-direction: column;
-    max-height: 85vh;
-  }
-
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .modal-title-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .modal-title-group h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-  }
-
-  :global(.header-icon) {
-    color: var(--ice-500);
-  }
-
-  .invoice-body {
-    padding: 14px 0;
-    overflow-y: auto;
-    flex: 1;
-  }
-
-  .invoice-pre {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    font-size: 0.9rem;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: var(--text-primary);
-  }
-
-  .modal-footer {
-    display: flex;
-    gap: 12px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border-color);
-  }
-
-  .copy-btn, .wa-btn {
-    flex: 1;
-  }
-
-  .wa-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-  }
-
-  @media (max-width: 480px) {
-    .modal-footer {
-      flex-direction: column;
-    }
-  }
-</style>
+      <Button
+        type="button"
+        variant="outline"
+        class="flex-1 rounded-2xl font-bold gap-2 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+        onclick={handleWhatsApp}
+      >
+        <MessageSquare class="size-4" />
+        <span>ارسال در واتساپ</span>
+      </Button>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog.Root>
