@@ -4,7 +4,7 @@
   import { Package, Info } from '@lucide/svelte';
 
   const result = $derived(store.primerResult);
-  const typesList = Object.values(PRIMER_TYPES);
+  const typesList = $derived(Object.values(store.settings.primerTypes));
 
   function handleToggle(e) {
     store.primer.enabled = e.target.checked;

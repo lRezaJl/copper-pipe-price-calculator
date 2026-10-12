@@ -1,5 +1,5 @@
-// وزن‌های استاندارد لوله‌های مسی (کیلوگرم در هر کلاف 50 متری)
-export const PIPE_WEIGHTS = {
+// وزن‌های استاندارد اولیه لوله‌های مسی (کیلوگرم در هر کلاف 50 متری)
+export const DEFAULT_PIPE_WEIGHTS = {
   "1/4-0.25": 5.23,
   "1/4-0.30": 5.95,
   "3/8-0.25": 8.17,
@@ -9,6 +9,7 @@ export const PIPE_WEIGHTS = {
   "5/8-0.25": 14.21,
   "5/8-0.30": 16.28,
 };
+export const PIPE_WEIGHTS = DEFAULT_PIPE_WEIGHTS;
 
 // لیست سایزها و ضخامت‌های مجاز
 export const PIPE_SIZES = [
@@ -24,15 +25,16 @@ export const PIPE_THICKNESSES = [
 ];
 
 // قیمت‌های پایه عایق بر اساس سایز (شاخه 1.8 متری)
-export const INSULATION_BASE_PRICES = {
+export const DEFAULT_INSULATION_BASE_PRICES = {
   "1/4": 1070000,
   "3/8": 1340000,
   "1/2": 1600000,
   "5/8": 1780000,
 };
+export const INSULATION_BASE_PRICES = DEFAULT_INSULATION_BASE_PRICES;
 
 // قیمت و مشخصات انواع پرایمر
-export const PRIMER_TYPES = {
+export const DEFAULT_PRIMER_TYPES = {
   high: { key: "high", label: "پرایمر دور بالا", price: 4050000, perLength: 5 },
   low: { key: "low", label: "پرایمر دور پایین", price: 2500000, perLength: 3 },
   tableHigh: {
@@ -48,6 +50,7 @@ export const PRIMER_TYPES = {
     perLength: 3,
   },
 };
+export const PRIMER_TYPES = DEFAULT_PRIMER_TYPES;
 
 // تبدیل عدد به فرمت جداکننده سه‌رقمی
 export function formatNumber(num) {
@@ -101,7 +104,14 @@ export function getTodayJalali() {
 }
 
 // محاسبه قیمت یک لوله
-export function calculatePipe({ enabled, size, thickness, length, unitPrice }) {
+export function calculatePipe({
+  enabled,
+  size,
+  thickness,
+  length,
+  unitPrice,
+  pipeWeights = DEFAULT_PIPE_WEIGHTS,
+}) {
   if (!enabled) {
     return {
       enabled: false,
@@ -115,7 +125,8 @@ export function calculatePipe({ enabled, size, thickness, length, unitPrice }) {
   const numLength = parseFloat(length) || 0;
   const numUnitPrice = parseFloat(unitPrice) || 0;
   const key = `${size}-${thickness}`;
-  const weight = PIPE_WEIGHTS[key] || 0;
+  const weights = pipeWeights || DEFAULT_PIPE_WEIGHTS;
+  const weight = weights[key] !== undefined ? parseFloat(weights[key]) : 0;
 
   if (weight === 0 || numLength <= 0 || numUnitPrice <= 0) {
     return {
@@ -144,7 +155,12 @@ export function calculatePipe({ enabled, size, thickness, length, unitPrice }) {
 }
 
 // محاسبه قیمت عایق
-export function calculateInsulation({ enabled, pipe1, pipe2 }) {
+export function calculateInsulation({
+  enabled,
+  pipe1,
+  pipe2,
+  insulationPrices = DEFAULT_INSULATION_BASE_PRICES,
+}) {
   if (!enabled) {
     return { enabled: false, valid: false, totalPrice: 0, details: null };
   }
@@ -160,6 +176,7 @@ export function calculateInsulation({ enabled, pipe1, pipe2 }) {
   const len2 = p2Active ? parseFloat(pipe2.length) || 0 : 0;
   const size1 = pipe1.size;
   const size2 = pipe2.size;
+  const prices = insulationPrices || DEFAULT_INSULATION_BASE_PRICES;
 
   // اگر هر دو لوله فعال باشند
   if (p1Active && p2Active) {
@@ -167,8 +184,8 @@ export function calculateInsulation({ enabled, pipe1, pipe2 }) {
 
     if (sameLength) {
       const pairsNeeded = Math.ceil(len1 / 1.8);
-      const price1 = INSULATION_BASE_PRICES[size1] || 0;
-      const price2 = INSULATION_BASE_PRICES[size2] || 0;
+      const price1 = parseFloat(prices[size1]) || 0;
+      const price2 = parseFloat(prices[size2]) || 0;
       const pairPrice = price1 + price2;
       const totalPrice = pairPrice * pairsNeeded;
 
@@ -188,8 +205,8 @@ export function calculateInsulation({ enabled, pipe1, pipe2 }) {
       // متراژهای متفاوت
       const pairs1 = Math.ceil(len1 / 1.8);
       const pairs2 = Math.ceil(len2 / 1.8);
-      const price1 = INSULATION_BASE_PRICES[size1] || 0;
-      const price2 = INSULATION_BASE_PRICES[size2] || 0;
+      const price1 = parseFloat(prices[size1]) || 0;
+      const price2 = parseFloat(prices[size2]) || 0;
       const total1 = price1 * pairs1;
       const total2 = price2 * pairs2;
       const totalPrice = total1 + total2;
@@ -212,7 +229,7 @@ export function calculateInsulation({ enabled, pipe1, pipe2 }) {
   const activeSize = p1Active ? size1 : size2;
   const activeLen = p1Active ? len1 : len2;
   const pairsNeeded = Math.ceil(activeLen / 1.8);
-  const price = INSULATION_BASE_PRICES[activeSize] || 0;
+  const price = parseFloat(prices[activeSize]) || 0;
   const totalPrice = price * pairsNeeded;
 
   return {
@@ -228,7 +245,14 @@ export function calculateInsulation({ enabled, pipe1, pipe2 }) {
 }
 
 // محاسبه قیمت پرایمر
-export function calculatePrimer({ enabled, type, manualCount, pipe1, pipe2 }) {
+export function calculatePrimer({
+  enabled,
+  type,
+  manualCount,
+  pipe1,
+  pipe2,
+  primerTypes = DEFAULT_PRIMER_TYPES,
+}) {
   if (!enabled) {
     return {
       enabled: false,
@@ -252,28 +276,31 @@ export function calculatePrimer({ enabled, type, manualCount, pipe1, pipe2 }) {
     };
   }
 
-  const primerInfo = PRIMER_TYPES[type] || PRIMER_TYPES.high;
+  const types = primerTypes || DEFAULT_PRIMER_TYPES;
+  const primerInfo = types[type] || types.high || DEFAULT_PRIMER_TYPES.high;
   const len1 = p1Active ? parseFloat(pipe1.length) || 0 : 0;
   const len2 = p2Active ? parseFloat(pipe2.length) || 0 : 0;
 
   let unitsNeeded = 1;
   let isManualMode = false;
+  const perLength = parseFloat(primerInfo.perLength) || 1;
+  const price = parseFloat(primerInfo.price) || 0;
 
   if (p1Active && p2Active) {
     if (len1 === len2) {
-      unitsNeeded = Math.ceil(len1 / primerInfo.perLength);
+      unitsNeeded = Math.ceil(len1 / perLength);
       isManualMode = false;
     } else {
       isManualMode = true;
       unitsNeeded = parseInt(manualCount) || 1;
     }
   } else if (p1Active) {
-    unitsNeeded = Math.ceil(len1 / primerInfo.perLength);
+    unitsNeeded = Math.ceil(len1 / perLength);
   } else if (p2Active) {
-    unitsNeeded = Math.ceil(len2 / primerInfo.perLength);
+    unitsNeeded = Math.ceil(len2 / perLength);
   }
 
-  const totalPrice = unitsNeeded * primerInfo.price;
+  const totalPrice = unitsNeeded * price;
 
   return {
     enabled: true,

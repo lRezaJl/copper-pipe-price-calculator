@@ -4,6 +4,9 @@ import {
   calculatePrimer,
   generateInvoiceText,
   toToman,
+  DEFAULT_PIPE_WEIGHTS,
+  DEFAULT_INSULATION_BASE_PRICES,
+  DEFAULT_PRIMER_TYPES,
 } from "./calculator.js";
 
 const STORAGE_KEY = "copperPipeCalculator_v3";
@@ -36,6 +39,18 @@ export class CalculatorStore {
     manualCount: 1,
   });
 
+  // تنظیمات مقادیر اولیه (وزن لوله‌ها، قیمت عایق‌ها، قیمت و متراژ پرایمرها)
+  settings = $state({
+    pipeWeights: { ...DEFAULT_PIPE_WEIGHTS },
+    insulationPrices: { ...DEFAULT_INSULATION_BASE_PRICES },
+    primerTypes: {
+      high: { ...DEFAULT_PRIMER_TYPES.high },
+      low: { ...DEFAULT_PRIMER_TYPES.low },
+      tableHigh: { ...DEFAULT_PRIMER_TYPES.tableHigh },
+      tableLow: { ...DEFAULT_PRIMER_TYPES.tableLow },
+    },
+  });
+
   toast = $state({
     show: false,
     message: "",
@@ -50,6 +65,7 @@ export class CalculatorStore {
       thickness: this.pipe1.thickness,
       length: this.pipe1.length,
       unitPrice: this.unitPrice,
+      pipeWeights: this.settings.pipeWeights,
     }),
   );
 
@@ -60,6 +76,7 @@ export class CalculatorStore {
       thickness: this.pipe2.thickness,
       length: this.pipe2.length,
       unitPrice: this.unitPrice,
+      pipeWeights: this.settings.pipeWeights,
     }),
   );
 
@@ -68,6 +85,7 @@ export class CalculatorStore {
       enabled: this.insulation.enabled,
       pipe1: this.pipe1,
       pipe2: this.pipe2,
+      insulationPrices: this.settings.insulationPrices,
     }),
   );
 
@@ -78,6 +96,7 @@ export class CalculatorStore {
       manualCount: this.primer.manualCount,
       pipe1: this.pipe1,
       pipe2: this.pipe2,
+      primerTypes: this.settings.primerTypes,
     }),
   );
 
@@ -139,6 +158,16 @@ export class CalculatorStore {
         pipe2: { ...this.pipe2 },
         insulation: { ...this.insulation },
         primer: { ...this.primer },
+        settings: {
+          pipeWeights: { ...this.settings.pipeWeights },
+          insulationPrices: { ...this.settings.insulationPrices },
+          primerTypes: {
+            high: { ...this.settings.primerTypes.high },
+            low: { ...this.settings.primerTypes.low },
+            tableHigh: { ...this.settings.primerTypes.tableHigh },
+            tableLow: { ...this.settings.primerTypes.tableLow },
+          },
+        },
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
@@ -159,6 +188,29 @@ export class CalculatorStore {
         if (data.pipe2) Object.assign(this.pipe2, data.pipe2);
         if (data.insulation) Object.assign(this.insulation, data.insulation);
         if (data.primer) Object.assign(this.primer, data.primer);
+
+        if (data.settings) {
+          if (data.settings.pipeWeights) {
+            this.settings.pipeWeights = {
+              ...DEFAULT_PIPE_WEIGHTS,
+              ...data.settings.pipeWeights,
+            };
+          }
+          if (data.settings.insulationPrices) {
+            this.settings.insulationPrices = {
+              ...DEFAULT_INSULATION_BASE_PRICES,
+              ...data.settings.insulationPrices,
+            };
+          }
+          if (data.settings.primerTypes) {
+            this.settings.primerTypes = {
+              high: { ...DEFAULT_PRIMER_TYPES.high, ...data.settings.primerTypes?.high },
+              low: { ...DEFAULT_PRIMER_TYPES.low, ...data.settings.primerTypes?.low },
+              tableHigh: { ...DEFAULT_PRIMER_TYPES.tableHigh, ...data.settings.primerTypes?.tableHigh },
+              tableLow: { ...DEFAULT_PRIMER_TYPES.tableLow, ...data.settings.primerTypes?.tableLow },
+            };
+          }
+        }
         return;
       }
 
@@ -194,7 +246,41 @@ export class CalculatorStore {
     }
   }
 
-  // ریست فرم به مقادیر اولیه
+  // به‌روزرسانی تنظیمات مقادیر اولیه
+  updateSettings(newSettings) {
+    if (newSettings.pipeWeights) {
+      this.settings.pipeWeights = { ...newSettings.pipeWeights };
+    }
+    if (newSettings.insulationPrices) {
+      this.settings.insulationPrices = { ...newSettings.insulationPrices };
+    }
+    if (newSettings.primerTypes) {
+      this.settings.primerTypes = {
+        high: { ...newSettings.primerTypes.high },
+        low: { ...newSettings.primerTypes.low },
+        tableHigh: { ...newSettings.primerTypes.tableHigh },
+        tableLow: { ...newSettings.primerTypes.tableLow },
+      };
+    }
+    this.saveToStorage();
+    this.showToast("تنظیمات با موفقیت ذخیره شد", "success");
+  }
+
+  // بازنشانی تنظیمات مقادیر اولیه به حالت کارخانه
+  resetSettings() {
+    this.settings.pipeWeights = { ...DEFAULT_PIPE_WEIGHTS };
+    this.settings.insulationPrices = { ...DEFAULT_INSULATION_BASE_PRICES };
+    this.settings.primerTypes = {
+      high: { ...DEFAULT_PRIMER_TYPES.high },
+      low: { ...DEFAULT_PRIMER_TYPES.low },
+      tableHigh: { ...DEFAULT_PRIMER_TYPES.tableHigh },
+      tableLow: { ...DEFAULT_PRIMER_TYPES.tableLow },
+    };
+    this.saveToStorage();
+    this.showToast("تنظیمات به مقادیر اولیه بازگردانی شد", "info");
+  }
+
+  // ریست فرم به مقادیر اولیه ورودی (بدون پاک کردن تنظیمات پایه‌ای کاربر)
   reset() {
     this.unitPrice = 53000000;
     this.pipe1.enabled = true;
@@ -213,11 +299,7 @@ export class CalculatorStore {
     this.primer.type = "high";
     this.primer.manualCount = 1;
 
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem("copperPipeCalculator");
-    } catch (e) {}
-
+    this.saveToStorage();
     this.showToast("تمام ورودی‌ها پاک شدند", "info");
   }
 

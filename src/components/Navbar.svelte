@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
-  import { Sun, Moon, Flame, Snowflake, Download } from '@lucide/svelte';
+  import { Sun, Moon, Flame, Snowflake, Download, Settings } from '@lucide/svelte';
+
+  let { onOpenSettings } = $props();
 
   let isDark = $state(false);
   let deferredPrompt = $state(null);
@@ -65,6 +67,17 @@
       <button class="btn btn-secondary install-btn" onclick={installApp} title="نصب اپلیکیشن روی دستگاه">
         <Download size={17} />
         <span>نصب PWA</span>
+      </button>
+    {/if}
+
+    {#if onOpenSettings}
+      <button
+        class="btn btn-ghost settings-nav-btn"
+        onclick={onOpenSettings}
+        title="تنظیمات مقادیر اولیه (وزن، عایق، پرایمر)"
+        aria-label="تنظیمات"
+      >
+        <Settings size={20} class="settings-nav-icon" />
       </button>
     {/if}
 
@@ -160,6 +173,33 @@
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border-color);
+  }
+
+  .settings-nav-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+
+  .settings-nav-btn:hover {
+    color: var(--copper-500);
+    border-color: var(--copper-500);
+    background: var(--copper-glow);
+  }
+
+  .settings-nav-btn:hover :global(.settings-nav-icon) {
+    transform: rotate(45deg);
+  }
+
+  :global(.settings-nav-icon) {
+    transition: transform 0.35s ease;
   }
 
   :global(.sun-icon) {
