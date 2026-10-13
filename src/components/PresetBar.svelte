@@ -4,7 +4,10 @@
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
   import { Input } from '$lib/components/ui/input';
+  import { Card, CardContent } from '$lib/components/ui/card';
   import * as Dialog from '$lib/components/ui/dialog';
+  import * as Drawer from '$lib/components/ui/drawer';
+  import { useMediaQuery } from '$lib/hooks/use-media-query.svelte.js';
   import {
     SlidersHorizontal,
     Pencil,
@@ -14,7 +17,11 @@
     CheckCircle2,
     Layers,
     Tag,
+    X,
   } from '@lucide/svelte';
+
+  // تشخیص سایز نمایشگر: برای md و بزرگ‌تر از Dialog و برای max-md از Drawer استفاده می‌شود
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   // وضعیت مودال تغییر نام
   let isRenameOpen = $state(false);
@@ -81,14 +88,16 @@
 
 <div class="relative group">
   <!-- افکت گرادیان درخشان پشت کادر الگوها -->
-  <div class="absolute -inset-0.5 bg-linear-to-r from-sky-500/20 via-orange-500/15 to-amber-500/20 rounded-3xl blur-xl -z-10 opacity-75 group-hover:opacity-95 transition-opacity"></div>
+  <div class="absolute -inset-0.5 bg-linear-to-r from-sky-500/20 via-orange-500/15 to-amber-500/20 rounded-2xl blur-xl -z-10 opacity-75 group-hover:opacity-95 transition-opacity"></div>
 
-  <div class="relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/75 dark:bg-card/50 backdrop-blur-2xl p-4 sm:p-5 shadow-xl shadow-black/5 overflow-hidden space-y-4">
+  <Card class="relative overflow-hidden rounded-2xl border-white/30 dark:border-white/10 bg-card/75 dark:bg-card/50 backdrop-blur-2xl shadow-xl shadow-black/5">
     <!-- نوار تزئینی بالای کارت -->
     <div class="absolute top-0 right-0 left-0 h-1 bg-linear-to-r from-sky-500 via-orange-500 to-amber-500"></div>
 
+    <CardContent class="p-4 sm:p-5 space-y-4">
+
     <!-- هدر بخش الگوها -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="size-9 sm:size-10 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/20 shadow-xs">
           <Layers class="size-4.5 sm:size-5" />
@@ -105,7 +114,7 @@
       </div>
 
       <!-- دکمه‌های سریع برای الگو فعال -->
-      <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+      <div class="flex items-center gap-1.5 self-end md:self-center shrink-0">
         <Button
           type="button"
           variant="outline"
@@ -196,86 +205,141 @@
         </div>
       {/each}
     </div>
-  </div>
+  </CardContent>
+</Card>
 </div>
 
-<!-- مودال تغییر نام الگو -->
-<Dialog.Root bind:open={isRenameOpen}>
-  <Dialog.Content class="sm:max-w-md">
-    <Dialog.Header>
-      <div class="flex items-center gap-2.5">
-        <div class="size-9 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
-          <Pencil class="size-4" />
-        </div>
-        <div>
-          <Dialog.Title>تغییر نام الگو</Dialog.Title>
-          <Dialog.Description>
-            یک نام واضح و مشخص برای این الگوی محاسباتی وارد کنید.
-          </Dialog.Description>
-        </div>
-      </div>
-    </Dialog.Header>
-
-    <div class="space-y-4">
-      <div class="space-y-2">
-        <label for="preset-name-input" class="text-xs font-semibold text-foreground block">
-          نام الگو:
-        </label>
-        <Input
-          id="preset-name-input"
-          type="text"
-          dir="rtl"
-          placeholder="مثال: مهر اصل، پروژه فاز ۲، کولر ۲۴۰۰۰..."
-          bind:value={draftPresetName}
-          onkeydown={(e) => e.key === 'Enter' && handleSaveRename()}
-          class="text-right font-medium"
-          autofocus
-        />
-      </div>
-
-      <!-- پیشنهادهای آماده نام -->
-      <div class="space-y-2">
-        <span class="text-xs text-muted-foreground flex items-center gap-1">
-          <Tag class="size-3 text-orange-500" />
-          <span>پیشنهادهای سریع:</span>
-        </span>
-        <div class="flex flex-wrap gap-1.5">
-          {#each SUGGESTED_NAMES as sug}
-            <button
-              type="button"
-              onclick={() => applySuggestedName(sug)}
-              class="text-xs px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-orange-500/15 hover:text-orange-600 dark:hover:text-orange-400 border border-transparent hover:border-orange-500/30 transition-colors cursor-pointer"
-            >
-              {sug}
-            </button>
-          {/each}
-        </div>
-      </div>
+<!-- محتوای فرم تغییر نام الگو (مشترک بین Dialog و Drawer) -->
+{#snippet renameBody()}
+  <div class="space-y-4">
+    <div class="space-y-2">
+      <label for="preset-name-input" class="text-xs font-semibold text-foreground block">
+        نام الگو:
+      </label>
+      <Input
+        id="preset-name-input"
+        type="text"
+        dir="rtl"
+        placeholder="مثال: مهر اصل، پروژه فاز ۲، کولر ۲۴۰۰۰..."
+        bind:value={draftPresetName}
+        onkeydown={(e) => e.key === 'Enter' && handleSaveRename()}
+        class="text-right font-medium"
+        autofocus={isDesktop.current}
+      />
     </div>
 
-    <Dialog.Footer>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onclick={() => (isRenameOpen = false)}
-        class="cursor-pointer"
-      >
-        انصراف
-      </Button>
-      <Button
-        type="button"
-        variant="default"
-        size="sm"
-        onclick={handleSaveRename}
-        class="bg-orange-600 hover:bg-orange-700 text-white gap-1.5 cursor-pointer"
-      >
-        <Check class="size-4" />
-        <span>ذخیره نام</span>
-      </Button>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+    <!-- پیشنهادهای آماده نام -->
+    <div class="space-y-2">
+      <span class="text-xs text-muted-foreground flex items-center gap-1">
+        <Tag class="size-3 text-orange-500" />
+        <span>پیشنهادهای سریع:</span>
+      </span>
+      <div class="flex flex-wrap gap-1.5">
+        {#each SUGGESTED_NAMES as sug}
+          <button
+            type="button"
+            onclick={() => applySuggestedName(sug)}
+            class="text-xs px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-orange-500/15 hover:text-orange-600 dark:hover:text-orange-400 border border-transparent hover:border-orange-500/30 transition-colors cursor-pointer"
+          >
+            {sug}
+          </button>
+        {/each}
+      </div>
+    </div>
+  </div>
+{/snippet}
+
+{#if isDesktop.current}
+  <!-- حالت مودال دیالوگ برای دسکتاپ و اندازه‌های بزرگ‌تر از md -->
+  <Dialog.Root bind:open={isRenameOpen}>
+    <Dialog.Content class="sm:max-w-md">
+      <Dialog.Header>
+        <div class="flex items-center gap-2.5">
+          <div class="size-9 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+            <Pencil class="size-4" />
+          </div>
+          <div>
+            <Dialog.Title>تغییر نام الگو</Dialog.Title>
+            <Dialog.Description>
+              یک نام واضح و مشخص برای این الگوی محاسباتی وارد کنید.
+            </Dialog.Description>
+          </div>
+        </div>
+      </Dialog.Header>
+
+      {@render renameBody()}
+
+      <Dialog.Footer>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onclick={() => (isRenameOpen = false)}
+          class="cursor-pointer"
+        >
+          انصراف
+        </Button>
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onclick={handleSaveRename}
+          class="bg-orange-600 hover:bg-orange-700 text-white gap-1.5 cursor-pointer"
+        >
+          <Check class="size-4" />
+          <span>ذخیره نام</span>
+        </Button>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
+{:else}
+  <!-- حالت دراور (Drawer) برای اندازه‌های کوچک‌تر از md (max-md:*) -->
+  <Drawer.Root bind:open={isRenameOpen}>
+    <Drawer.Content class="max-w-lg mx-auto">
+      <Drawer.Header class="px-4 pt-2 text-right">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="size-9 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+              <Pencil class="size-4" />
+            </div>
+            <div class="text-right">
+              <Drawer.Title class="text-base font-bold text-foreground">تغییر نام الگو</Drawer.Title>
+              <Drawer.Description class="text-xs text-muted-foreground mt-0.5">
+                یک نام واضح و مشخص برای این الگو وارد کنید.
+              </Drawer.Description>
+            </div>
+          </div>
+        </div>
+      </Drawer.Header>
+
+      <div class="px-5 py-4 overflow-y-auto">
+        {@render renameBody()}
+      </div>
+
+      <Drawer.Footer class="pt-4 px-4 flex flex-row items-center justify-between gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="default"
+          onclick={() => (isRenameOpen = false)}
+          class="flex-1 cursor-pointer"
+        >
+          انصراف
+        </Button>
+        <Button
+          type="button"
+          variant="default"
+          size="default"
+          onclick={handleSaveRename}
+          class="flex-1 bg-orange-600 hover:bg-orange-700 text-white gap-1.5 cursor-pointer"
+        >
+          <Check class="size-4" />
+          <span>ذخیره نام</span>
+        </Button>
+      </Drawer.Footer>
+    </Drawer.Content>
+  </Drawer.Root>
+{/if}
 
 <!-- مودال تایید بازنشانی الگو به مقادیر پیش‌فرض کارخانه -->
 <Dialog.Root bind:open={isResetConfirmOpen}>

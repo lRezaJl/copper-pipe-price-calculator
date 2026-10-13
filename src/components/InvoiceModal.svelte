@@ -70,7 +70,7 @@
       <Button
         type="button"
         variant="default"
-        class="flex-1 rounded-2xl font-bold gap-2 bg-linear-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-md shadow-orange-500/20"
+        class="sm:flex-1 rounded-2xl font-bold gap-2 bg-linear-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-md shadow-orange-500/20"
         onclick={handleCopy}
       >
         {#if copied}
@@ -85,7 +85,7 @@
       <Button
         type="button"
         variant="outline"
-        class="flex-1 rounded-2xl font-bold gap-2 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+        class="sm:flex-1 rounded-2xl font-bold gap-2 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
         onclick={handleWhatsApp}
       >
         <MessageSquare class="size-4" />

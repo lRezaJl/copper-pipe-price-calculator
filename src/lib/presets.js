@@ -40,16 +40,7 @@ export const PRESET_1_DEFAULTS = {
     manualCount: 1,
   },
   settings: {
-    pipeWeights: {
-      "1/4-0.25": 5.3, // سایز ۱/۴ ضخامت ۰.۲۵
-      "1/4-0.30": 5.95, // سایز ۱/۴ ضخامت ۰.۳۰
-      "3/8-0.25": 8.2, // سایز ۳/۸ ضخامت ۰.۲۵
-      "3/8-0.30": 9.5, // سایز ۳/۸ ضخامت ۰.۳۰
-      "1/2-0.25": 11.18, // سایز ۱/۲ ضخامت ۰.۲۵
-      "1/2-0.30": 12.9, // سایز ۱/۲ ضخامت ۰.۳۰
-      "5/8-0.25": 14.5, // سایز ۵/۸ ضخامت ۰.۲۵
-      "5/8-0.30": 16.68, // سایز ۵/۸ ضخامت ۰.۳۰
-    },
+    pipeWeights: { ...DEFAULT_PIPE_WEIGHTS },
     insulationPrices: { ...DEFAULT_INSULATION_BASE_PRICES },
     primerTypes: {
       high: { ...DEFAULT_PRIMER_TYPES.high },
@@ -86,7 +77,16 @@ export const PRESET_2_DEFAULTS = {
     manualCount: 1,
   },
   settings: {
-    pipeWeights: { ...DEFAULT_PIPE_WEIGHTS },
+    pipeWeights: {
+      "1/4-0.25": 4.84, // سایز ۱/۴ ضخامت ۰.۲۵
+      "1/4-0.30": 5.935, // سایز ۱/۴ ضخامت ۰.۳۰
+      "3/8-0.25": 7.9, // سایز ۳/۸ ضخامت ۰.۲۵
+      "3/8-0.30": 9.46, // سایز ۳/۸ ضخامت ۰.۳۰
+      "1/2-0.25": 10.59, // سایز ۱/۲ ضخامت ۰.۲۵
+      "1/2-0.30": 12.65, // سایز ۱/۲ ضخامت ۰.۳۰
+      "5/8-0.25": 13.35, // سایز ۵/۸ ضخامت ۰.۲۵
+      "5/8-0.30": 16.7, // سایز ۵/۸ ضخامت ۰.۳۰
+    },
     insulationPrices: { ...DEFAULT_INSULATION_BASE_PRICES },
     primerTypes: {
       high: { ...DEFAULT_PRIMER_TYPES.high },

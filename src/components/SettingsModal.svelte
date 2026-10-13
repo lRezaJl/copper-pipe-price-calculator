@@ -345,7 +345,7 @@
       showCloseButton={false}
       class="sm:max-w-2xl max-w-2xl p-0 gap-0 overflow-hidden flex flex-col max-h-[85vh]"
     >
-      <Dialog.Header class="px-6 py-4 border-b border-border/70 flex flex-row items-center justify-between text-right bg-card/60 backdrop-blur-md">
+      <Dialog.Header class="px-6 py-4 flex flex-row items-center justify-between text-right bg-card/60 backdrop-blur-md">
         <div class="flex items-center gap-3">
           <div class="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 shadow-xs">
             <Settings class="size-5 text-primary" />
@@ -376,7 +376,7 @@
   <!-- حالت دراور از پایین برای اندازه‌های کوچک‌تر از md (موبایل) -->
   <Drawer.Root bind:open={isOpen}>
     <Drawer.Content class="sm:max-w-2xl sm:mx-auto">
-      <Drawer.Header class="px-6 pt-2 pb-3.5 border-b border-border/70 flex flex-row items-center justify-between text-right bg-card/60 backdrop-blur-md">
+      <Drawer.Header class="px-6 py-4 flex flex-row items-center justify-between text-right bg-card/60 backdrop-blur-md">
         <div class="flex items-center gap-3">
           <div class="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 shadow-xs">
             <Settings class="size-5 text-primary" />

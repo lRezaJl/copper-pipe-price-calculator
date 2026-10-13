@@ -6,6 +6,14 @@
   import { Input } from '$lib/components/ui/input';
   import { Badge } from '$lib/components/ui/badge';
   import * as Select from '$lib/components/ui/select';
+  import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter
+  } from '$lib/components/ui/card';
   import { ArrowLeftRight, Weight } from '@lucide/svelte';
 
   let { pipeNumber = 1 } = $props();
@@ -40,26 +48,26 @@
   }
 </script>
 
-<div class="relative group">
+<div class="relative group h-full">
   <!-- گرادیان ملایم پشت کارت لوله -->
-  <div class={`absolute -inset-0.5 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity ${pipe.enabled ? 'bg-linear-to-br from-orange-500/25 via-amber-400/10 to-transparent' : 'bg-transparent'}`}></div>
+  <div class={`absolute -inset-0.5 rounded-2xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity ${pipe.enabled ? 'bg-linear-to-br from-orange-500/25 via-amber-400/10 to-transparent' : 'bg-transparent'}`}></div>
 
-  <div class={`relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-5 sm:p-7 shadow-xl shadow-black/5 transition-all duration-300 overflow-hidden flex flex-col justify-between ${!pipe.enabled ? 'opacity-65' : ''}`}>
+  <Card class={`relative overflow-hidden rounded-2xl border-white/30 dark:border-white/10 bg-card/75 dark:bg-card/50 backdrop-blur-2xl shadow-xl shadow-black/5 transition-all duration-300 flex flex-col justify-between h-full ${!pipe.enabled ? 'opacity-65' : ''}`}>
     <!-- نوار نشانگر لوله مسی -->
     <div class={`absolute top-0 right-0 left-0 h-1.5 transition-colors ${pipe.enabled ? 'bg-orange-500' : 'bg-muted'}`}></div>
 
     <div>
-      <!-- هدر کارت لوله -->
-      <div class="flex items-center justify-between pb-4 border-b border-border/60 gap-3">
+      <!-- هدر کارت لوله با شادسی‌ان -->
+      <CardHeader class="flex flex-row items-center justify-between gap-3 p-5 sm:p-6 pb-2 sm:pb-3 space-y-0">
         <div class="flex items-center gap-3">
-          <div class={`size-10 sm:size-11 rounded-2xl flex items-center justify-center font-black text-base shrink-0 border shadow-xs transition-colors ${pipe.enabled ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/25' : 'bg-muted text-muted-foreground border-border'}`}>
+          <div class={`size-10 sm:size-11 rounded-xl flex items-center justify-center font-black text-base shrink-0 border shadow-xs transition-colors ${pipe.enabled ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/25' : 'bg-muted text-muted-foreground border-border'}`}>
             {pipeNumber}
           </div>
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-foreground">لوله مسی شماره {pipeNumber}</h3>
-            <span class="text-xs text-muted-foreground block mt-0.5">
+            <CardTitle class="text-base sm:text-lg font-bold">لوله مسی شماره {pipeNumber}</CardTitle>
+            <CardDescription class="text-xs mt-0.5">
               {pipe.enabled ? `${pipe.size} اینچ - ضخامت ${pipe.thickness} میلی‌متر` : 'غیرفعال شده'}
-            </span>
+            </CardDescription>
           </div>
         </div>
 
@@ -74,11 +82,12 @@
             aria-label={pipe.enabled ? 'غیرفعال کردن' : 'فعال کردن'}
           />
         </div>
-      </div>
+      </CardHeader>
 
-      {#if pipe.enabled}
-        <div class="pt-4 space-y-3.5">
-          <!-- انتخاب سایز و ضخامت -->
+      <CardContent class="p-5 sm:p-6 pt-2 sm:pt-3">
+        {#if pipe.enabled}
+          <div class="space-y-3.5">
+            <!-- انتخاب سایز و ضخامت -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <!-- انتخاب سایز با کامپوننت شادسی‌ان -->
             <div class="space-y-1.5">
@@ -173,39 +182,42 @@
           </div>
         </div>
       {:else}
-        <div class="py-8 text-center text-xs sm:text-sm text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border mt-4">
+        <div class="py-8 text-center text-xs sm:text-sm text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border mt-2">
           این بخش غیرفعال است و در جمع کل لحاظ نمی‌شود.
         </div>
       {/if}
-    </div>
-
-    {#if pipe.enabled}
-      <!-- کادر نمایش نتایج این لوله -->
-      <div class="mt-4 p-3.5 sm:p-4 rounded-2xl bg-muted/30 backdrop-blur-sm border border-white/20 dark:border-white/10 space-y-2 text-xs sm:text-sm">
-      <div class="flex items-center justify-between text-muted-foreground">
-        <span class="flex items-center gap-1.5">
-          <Weight class="size-3.5 text-muted-foreground" />
-          وزن کلاف (۵۰ متر):
-        </span>
-        <span class="font-bold text-foreground">
-          {result.weight || '—'} <small class="text-xs text-muted-foreground">کیلوگرم</small>
-        </span>
-      </div>
-
-      <div class="flex items-center justify-between text-muted-foreground">
-        <span>قیمت هر متر:</span>
-        <span class="font-bold text-foreground">
-          {formatNumber(result.pricePerMeter)} <small class="text-xs text-muted-foreground">ریال</small>
-        </span>
-      </div>
-
-      <div class="pt-2 border-t border-border/70 flex items-center justify-between">
-        <span class="font-bold text-foreground">قیمت کل لوله {pipeNumber}:</span>
-        <span class="text-sm sm:text-base font-extrabold text-orange-600 dark:text-orange-400">
-          {formatNumber(result.totalPrice)} ریال
-        </span>
-      </div>
-    </div>
-  {/if}
+    </CardContent>
   </div>
+
+  {#if pipe.enabled}
+    <CardFooter class="p-5 sm:p-6 pt-0 block">
+      <!-- کادر نمایش نتایج این لوله -->
+      <div class="p-3.5 sm:p-4 rounded-2xl bg-muted/30 backdrop-blur-sm border border-white/20 dark:border-white/10 space-y-2 text-xs sm:text-sm">
+        <div class="flex items-center justify-between text-muted-foreground">
+          <span class="flex items-center gap-1.5">
+            <Weight class="size-3.5 text-muted-foreground" />
+            وزن کلاف (۵۰ متر):
+          </span>
+          <span class="font-bold text-foreground">
+            {result.weight || '—'} <small class="text-xs text-muted-foreground">کیلوگرم</small>
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between text-muted-foreground">
+          <span>قیمت هر متر:</span>
+          <span class="font-bold text-foreground">
+            {formatNumber(result.pricePerMeter)} <small class="text-xs text-muted-foreground">ریال</small>
+          </span>
+        </div>
+
+        <div class="pt-2 border-t border-border/70 flex items-center justify-between">
+          <span class="font-bold text-foreground">قیمت کل لوله {pipeNumber}:</span>
+          <span class="text-sm sm:text-base font-extrabold text-orange-600 dark:text-orange-400">
+            {formatNumber(result.totalPrice)} ریال
+          </span>
+        </div>
+      </div>
+    </CardFooter>
+  {/if}
+</Card>
 </div>

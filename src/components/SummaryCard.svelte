@@ -3,8 +3,8 @@
   import { formatNumber } from '../lib/calculator.js';
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
+  import { Card, CardContent } from '$lib/components/ui/card';
   import { Share2, Copy, Eye, RotateCcw, Check, Sparkles } from '@lucide/svelte';
-  import confetti from 'canvas-confetti';
 
   let { onOpenModal } = $props();
   let copied = $state(false);
@@ -13,7 +13,6 @@
     try {
       await navigator.clipboard.writeText(store.invoiceText);
       copied = true;
-      triggerConfetti();
       store.showToast("متن فاکتور در کلیپ‌بورد کپی شد!", "success");
       setTimeout(() => (copied = false), 2500);
     } catch (e) {
@@ -39,28 +38,20 @@
       onOpenModal();
     }
   }
-
-  function triggerConfetti() {
-    try {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.85 },
-      });
-    } catch (e) {}
-  }
 </script>
 
 <div class="relative group">
   <!-- گرادیان درخشان پشت کارت جمع کل فاکتور -->
-  <div class="absolute -inset-1 bg-linear-to-r from-orange-500/30 via-sky-500/25 to-emerald-500/30 rounded-3xl blur-2xl -z-10 opacity-75 group-hover:opacity-100 transition-opacity"></div>
+  <div class="absolute -inset-1 bg-linear-to-r from-orange-500/30 via-sky-500/25 to-emerald-500/30 rounded-2xl blur-2xl -z-10 opacity-75 group-hover:opacity-100 transition-opacity"></div>
 
-  <div class="relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl shadow-black/10 overflow-hidden space-y-6">
+  <Card class="relative overflow-hidden rounded-2xl border-white/30 dark:border-white/10 bg-card/75 dark:bg-card/50 backdrop-blur-2xl shadow-2xl shadow-black/10">
     <!-- نوار گرادیان بالای کارت -->
     <div class="absolute top-0 right-0 left-0 h-1.5 bg-linear-to-r from-orange-500 via-sky-500 to-emerald-500"></div>
 
+    <CardContent class="p-6 sm:p-8 space-y-6">
+
     <!-- بخش اصلی جمع کل و تفکیک اقلام -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-border/70">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
       <!-- مبلغ کل فاکتور -->
       <div class="space-y-2">
         <Badge variant="secondary" class="gap-1.5">
@@ -114,7 +105,7 @@
       <Button
         type="button"
         size="lg"
-        class="flex-1 font-bold shadow-lg shadow-primary/20 gap-2 cursor-pointer"
+        class="sm:flex-1 font-bold shadow-lg shadow-primary/20 gap-2 cursor-pointer"
         onclick={handleShare}
       >
         <Share2 />
@@ -161,5 +152,6 @@
         <RotateCcw />
       </Button>
     </div>
-  </div>
+  </CardContent>
+</Card>
 </div>

@@ -3,30 +3,37 @@
   import { formatNumber } from '../lib/calculator.js';
   import { Switch } from '$lib/components/ui/switch';
   import { Badge } from '$lib/components/ui/badge';
+  import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent
+  } from '$lib/components/ui/card';
   import { Shield, Info } from '@lucide/svelte';
 
   const result = $derived(store.insulationResult);
 </script>
 
-<div class="relative group">
+<div class="relative group h-full">
   <!-- گرادیان ملایم پشت کارت عایق -->
-  <div class={`absolute -inset-0.5 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity ${store.insulation.enabled ? 'bg-linear-to-br from-sky-500/25 via-sky-400/10 to-transparent' : 'bg-transparent'}`}></div>
+  <div class={`absolute -inset-0.5 rounded-2xl blur-xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity ${store.insulation.enabled ? 'bg-linear-to-br from-sky-500/25 via-sky-400/10 to-transparent' : 'bg-transparent'}`}></div>
 
-  <div class={`relative rounded-3xl border border-white/30 dark:border-white/10 bg-card/70 dark:bg-card/50 backdrop-blur-2xl p-5 sm:p-7 shadow-xl shadow-black/5 transition-all duration-300 overflow-hidden flex flex-col justify-between ${!store.insulation.enabled ? 'opacity-65' : ''}`}>
+  <Card class={`relative overflow-hidden rounded-2xl border-white/30 dark:border-white/10 bg-card/75 dark:bg-card/50 backdrop-blur-2xl shadow-xl shadow-black/5 transition-all duration-300 flex flex-col justify-between h-full ${!store.insulation.enabled ? 'opacity-65' : ''}`}>
     <div class={`absolute top-0 right-0 left-0 h-1.5 transition-colors ${store.insulation.enabled ? 'bg-sky-500' : 'bg-muted'}`}></div>
 
     <div>
-      <!-- هدر کارت عایق -->
-      <div class="flex items-center justify-between pb-4 border-b border-border/60 gap-3">
+      <!-- هدر کارت عایق با شادسی‌ان -->
+      <CardHeader class="flex flex-row items-center justify-between gap-3 p-5 sm:p-6 pb-2 sm:pb-3 space-y-0">
         <div class="flex items-center gap-3">
-          <div class="size-10 sm:size-11 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20 shadow-xs">
+          <div class="size-10 sm:size-11 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20 shadow-xs">
             <Shield class="size-5 sm:size-6" />
           </div>
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-foreground">محاسبه عایق</h3>
-            <span class="text-xs text-muted-foreground block mt-0.5">
+            <CardTitle class="text-base sm:text-lg font-bold">محاسبه عایق</CardTitle>
+            <CardDescription class="text-xs mt-0.5">
               بر اساس طول شاخه‌های استاندارد ۱.۸ متری
-            </span>
+            </CardDescription>
           </div>
         </div>
 
@@ -41,10 +48,10 @@
             aria-label={store.insulation.enabled ? 'غیرفعال کردن' : 'فعال کردن'}
           />
         </div>
-      </div>
+      </CardHeader>
 
-      {#if store.insulation.enabled}
-        <div class="pt-4">
+      <CardContent class="p-5 sm:p-6 pt-2 sm:pt-3">
+        {#if store.insulation.enabled}
           {#if !result.valid}
             <div class="flex items-center gap-2.5 p-3.5 rounded-2xl bg-muted/30 backdrop-blur-sm text-muted-foreground text-xs sm:text-sm border border-dashed border-border">
               <Info class="size-4 shrink-0 text-sky-500" />
@@ -129,12 +136,12 @@
               {/if}
             </div>
           {/if}
-        </div>
-      {:else}
-        <div class="py-8 text-center text-xs sm:text-sm text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border mt-4">
-          <p>محاسبه عایق غیرفعال شده است.</p>
-        </div>
-      {/if}
+        {:else}
+          <div class="py-8 text-center text-xs sm:text-sm text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border mt-2">
+            <p>محاسبه عایق غیرفعال شده است.</p>
+          </div>
+        {/if}
+      </CardContent>
     </div>
-  </div>
+  </Card>
 </div>
