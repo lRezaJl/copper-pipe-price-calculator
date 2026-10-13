@@ -1,6 +1,6 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
-  import { PIPE_SIZES, PIPE_THICKNESSES, formatNumber } from '../lib/calculator.js';
+  import { PIPE_SIZES, PIPE_THICKNESSES, formatNumber, toEnglishDigits } from '../lib/calculator.js';
   import { Switch } from '$lib/components/ui/switch';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
@@ -16,7 +16,8 @@
   const otherPipe = $derived(pipeNumber === 1 ? store.pipe2 : store.pipe1);
 
   function handleLengthInput(e) {
-    pipe.length = e.target.value;
+    const val = toEnglishDigits(e.target.value);
+    pipe.length = val;
     store.syncLengths(pipeNumber);
   }
 
@@ -159,8 +160,9 @@
                 type="number"
                 min="0"
                 step="any"
-                class="text-center font-bold text-base sm:text-lg pl-12 pr-4 bg-background/40 backdrop-blur-sm"
-                placeholder="مثال: 10"
+                dir="ltr"
+                class="text-center font-bold text-base sm:text-lg pl-12 pr-12 bg-background/40 backdrop-blur-sm tabular-nums"
+                placeholder="10"
                 value={pipe.length}
                 oninput={handleLengthInput}
               />

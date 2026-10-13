@@ -49,24 +49,24 @@
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-  <Dialog.Content class="sm:max-w-xl bg-card text-card-foreground border-border rounded-3xl p-6 shadow-2xl">
-    <Dialog.Header class="text-right space-y-1.5 pb-2 border-b border-border/70">
+  <Dialog.Content class="sm:max-w-xl">
+    <Dialog.Header>
       <div class="flex items-center gap-2.5">
         <div class="size-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
           <Share2 class="size-4.5" />
         </div>
         <div>
-          <Dialog.Title class="text-base font-bold text-foreground">پیش‌نمایش و اشتراک‌گذاری فاکتور</Dialog.Title>
+          <Dialog.Title>پیش‌نمایش و اشتراک‌گذاری فاکتور</Dialog.Title>
           <Dialog.Description class="sr-only">پیش‌نمایش و اشتراک‌گذاری فاکتور</Dialog.Description>
         </div>
       </div>
     </Dialog.Header>
 
-    <div class="py-3 max-h-[55vh] overflow-y-auto">
+    <div class="max-h-[55vh] overflow-y-auto">
       <pre class="bg-muted/40 border border-border/70 rounded-2xl p-4 text-xs leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground selection:bg-primary/20 select-text">{store.invoiceText}</pre>
     </div>
 
-    <Dialog.Footer class="pt-3 border-t border-border/70 flex flex-col sm:flex-row gap-2.5">
+    <Dialog.Footer class="flex flex-col sm:flex-row gap-2.5">
       <Button
         type="button"
         variant="default"

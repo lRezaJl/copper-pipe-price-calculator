@@ -1,5 +1,6 @@
 <script>
   import Navbar from './components/Navbar.svelte';
+  import PresetBar from './components/PresetBar.svelte';
   import UnitPriceCard from './components/UnitPriceCard.svelte';
   import PipeCard from './components/PipeCard.svelte';
   import InsulationCard from './components/InsulationCard.svelte';
@@ -33,6 +34,9 @@
   <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 relative z-10">
     <!-- هدر و تغییر تم / PWA / دکمه تنظیمات -->
     <Navbar onOpenSettings={openSettingsModal} />
+
+    <!-- بخش انتخاب و مدیریت الگوهای محاسبه -->
+    <PresetBar />
 
     <!-- کارت نرخ پایه مس -->
     <UnitPriceCard />

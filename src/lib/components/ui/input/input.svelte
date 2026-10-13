@@ -4,11 +4,17 @@
 		ref = $bindable(null),
 		value = $bindable(),
 		type,
+		dir,
 		files = $bindable(),
 		class: className,
 		"data-slot": dataSlot = "input",
 		...restProps
 	} = $props();
+
+	// تنظیم هوشمند جهت: فیلدهای عددی و شماره تلفن به صورت خودکار LTR و ایزوله می‌شوند مگر جهت خاصی ارسال شده باشد
+	const computedDir = $derived(
+		dir ?? (type === "number" || restProps.inputmode === "numeric" || restProps.inputmode === "decimal" || type === "tel" ? "ltr" : undefined)
+	);
 </script>
 
 {#if type === "file"}
@@ -20,6 +26,7 @@
 			className
 		)}
 		type="file"
+		dir={computedDir}
 		bind:files
 		bind:value
 		{...restProps}
@@ -33,6 +40,7 @@
 			className
 		)}
 		{type}
+		dir={computedDir}
 		bind:value
 		{...restProps}
 	/>

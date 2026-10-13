@@ -21,7 +21,7 @@
 		bind:ref
 		data-slot="dialog-content"
 		class={cn(
-			"bg-popover text-popover-foreground data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/5 grid max-w-[calc(100%_-_2rem)] gap-6 rounded-4xl p-6 text-sm ring-1 duration-100 sm:max-w-md fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none",
+			"bg-card text-card-foreground border border-border shadow-2xl rounded-3xl p-6 grid gap-6 fixed top-1/2 left-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 outline-none duration-200 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 sm:max-w-md",
 			className
 		)}
 		{...restProps}
@@ -30,9 +30,14 @@
 		{#if showCloseButton}
 			<DialogPrimitive.Close data-slot="dialog-close">
 				{#snippet child({ props })}
-					<Button variant="ghost" class="absolute top-4 right-4" size="icon-sm" {...props}>
-						<IconX  />
-						<span class="sr-only">Close</span>
+					<Button
+						variant="ghost"
+						class="absolute top-5 inset-e-5 rtl:left-5 rtl:right-auto ltr:right-5 ltr:left-auto rounded-full size-8 text-muted-foreground hover:text-foreground cursor-pointer transition-all active:scale-95"
+						size="icon-sm"
+						{...props}
+					>
+						<IconX class="size-4" />
+						<span class="sr-only">بستن</span>
 					</Button>
 				{/snippet}
 			</DialogPrimitive.Close>

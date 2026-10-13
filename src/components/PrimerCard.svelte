@@ -1,6 +1,6 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
-  import { formatNumber } from '../lib/calculator.js';
+  import { formatNumber, toEnglishDigits } from '../lib/calculator.js';
   import { Switch } from '$lib/components/ui/switch';
   import { Input } from '$lib/components/ui/input';
   import { Badge } from '$lib/components/ui/badge';
@@ -24,7 +24,8 @@
   }
 
   function handleManualCount(e) {
-    const val = parseInt(e.target.value) || 1;
+    const raw = toEnglishDigits(e.target.value);
+    const val = parseInt(raw, 10) || 1;
     store.primer.manualCount = val;
     store.saveToStorage();
   }
@@ -109,7 +110,9 @@
                   id="manual-count-input"
                   type="number"
                   min="1"
-                  class="text-center font-bold text-base sm:text-lg pl-12 pr-4 bg-background/40 backdrop-blur-sm"
+                  dir="ltr"
+                  class="text-center font-bold text-base sm:text-lg pl-12 pr-12 bg-background/40 backdrop-blur-sm tabular-nums"
+                  placeholder="1"
                   value={store.primer.manualCount}
                   oninput={handleManualCount}
                 />

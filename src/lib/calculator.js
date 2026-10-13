@@ -66,6 +66,18 @@ export function toToman(rial) {
   return Math.floor(rial / 10);
 }
 
+// تبدیل ارقام فارسی و عربی به ارقام انگلیسی و استانداردسازی اعشار
+export function toEnglishDigits(str) {
+  if (str === null || str === undefined) return '';
+  const strVal = String(str);
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return strVal
+    .replace(/[۰-۹]/g, (d) => persianDigits.indexOf(d))
+    .replace(/[٠-٩]/g, (d) => arabicDigits.indexOf(d))
+    .replace(/٫/g, '.');
+}
+
 // تبدیل تاریخ میلادی به شمسی (الگوریتم دقیق هجری شمسی)
 export function gregorianToJalali(gy, gm, gd) {
   const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
@@ -320,9 +332,13 @@ export function generateInvoiceText({
   insulationRes,
   primerRes,
   grandTotal,
+  presetName,
 }) {
   const dateFormatted = getTodayJalali();
   let text = `*فروشگاه فریزلنــد*    *${dateFormatted}*\n`;
+  if (presetName) {
+    text += `*الگو / الگو: ${presetName}*\n`;
+  }
 
   if (pipe1Res?.enabled && pipe1Res?.valid) {
     text += `لوله سایز ${pipe1Res.size} - ضخامت ${pipe1Res.thickness}  |  ${pipe1Res.length} متر  |  ${formatNumber(pipe1Res.pricePerMeter)} ریال  |  ${formatNumber(pipe1Res.totalPrice)} ریال\n`;

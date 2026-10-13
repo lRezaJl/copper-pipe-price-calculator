@@ -3,6 +3,7 @@ import Content from "./dialog-content.svelte";
 import Description from "./dialog-description.svelte";
 import Footer from "./dialog-footer.svelte";
 import Header from "./dialog-header.svelte";
+import Body from "./dialog-body.svelte";
 import Overlay from "./dialog-overlay.svelte";
 import Portal from "./dialog-portal.svelte";
 import Title from "./dialog-title.svelte";
@@ -15,6 +16,7 @@ export {
 	Portal,
 	Footer,
 	Header,
+	Body,
 	Trigger,
 	Overlay,
 	Content,
@@ -26,6 +28,7 @@ export {
 	Portal as DialogPortal,
 	Footer as DialogFooter,
 	Header as DialogHeader,
+	Body as DialogBody,
 	Trigger as DialogTrigger,
 	Overlay as DialogOverlay,
 	Content as DialogContent,

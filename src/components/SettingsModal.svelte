@@ -6,8 +6,10 @@
     DEFAULT_INSULATION_BASE_PRICES,
     DEFAULT_PRIMER_TYPES,
     formatNumber,
-    toToman
+    toToman,
+    toEnglishDigits
   } from '../lib/calculator.js';
+  import { DEFAULT_PRESETS } from '../lib/presets.js';
   import * as Dialog from '$lib/components/ui/dialog';
   import * as Drawer from '$lib/components/ui/drawer';
   import * as Tabs from '$lib/components/ui/tabs';
@@ -89,31 +91,37 @@
   }
 
   function handleResetToDefaults() {
-    draftPipeWeights = { ...DEFAULT_PIPE_WEIGHTS };
-    draftInsulationPrices = { ...DEFAULT_INSULATION_BASE_PRICES };
-    draftPrimerTypes = JSON.parse(JSON.stringify(DEFAULT_PRIMER_TYPES));
+    const def =
+      DEFAULT_PRESETS.find((p) => p.id === store.activePresetId) ||
+      DEFAULT_PRESETS[0];
+    draftPipeWeights = { ...def.settings.pipeWeights };
+    draftInsulationPrices = { ...def.settings.insulationPrices };
+    draftPrimerTypes = JSON.parse(JSON.stringify(def.settings.primerTypes));
     showResetConfirm = false;
-    store.showToast("مقادیر پیش‌فرض در فرم بارگذاری شد", "info");
+    store.showToast(
+      `مقادیر پیش‌فرض «${store.activePreset?.name}» در فرم بارگذاری شد`,
+      "info"
+    );
   }
 
   function updateWeight(key, val) {
-    draftPipeWeights[key] = val;
+    draftPipeWeights[key] = toEnglishDigits(val);
   }
 
   function updateInsulationPrice(size, val) {
-    const raw = String(val).replace(/[^0-9]/g, '');
+    const raw = toEnglishDigits(String(val)).replace(/[^0-9]/g, '');
     draftInsulationPrices[size] = raw ? parseInt(raw, 10) : 0;
   }
 
   function updatePrimerPrice(typeKey, val) {
-    const raw = String(val).replace(/[^0-9]/g, '');
+    const raw = toEnglishDigits(String(val)).replace(/[^0-9]/g, '');
     if (draftPrimerTypes[typeKey]) {
       draftPrimerTypes[typeKey].price = raw ? parseInt(raw, 10) : 0;
     }
   }
 
   function updatePrimerLength(typeKey, val) {
-    const num = parseFloat(val) || 1;
+    const num = parseFloat(toEnglishDigits(val)) || 1;
     if (draftPrimerTypes[typeKey]) {
       draftPrimerTypes[typeKey].perLength = num;
     }
@@ -146,12 +154,12 @@
           <span>وزن‌ها بر حسب <strong>کیلوگرم</strong> به ازای هر کلاف ۵۰ متری استاندارد محاسبه می‌شوند.</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 py-px">
           {#each PIPE_SIZES as item}
             <Card class="border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors p-3.5 rounded-2xl shadow-none">
               <div class="flex items-center justify-between mb-2.5">
                 <Badge variant="outline" class="font-bold text-xs bg-card border-border/80 px-2.5 py-0.5 rounded-lg">
-                  سایز {item.label} اینچ
+                  سایز {item.label}
                 </Badge>
               </div>
 
@@ -163,11 +171,12 @@
                       type="number"
                       step="0.01"
                       min="0.1"
-                      class="h-8 pl-9 pr-2.5 text-xs bg-card rounded-xl text-left"
+                      dir="ltr"
+                      class="h-8 pl-8 pr-2.5 text-xs bg-card rounded-xl text-left tabular-nums"
                       value={draftPipeWeights[`${item.value}-0.25`]}
                       oninput={(e) => updateWeight(`${item.value}-0.25`, e.target.value)}
                     />
-                    <span class="absolute left-2.5 top-2.5 text-[10px] text-muted-foreground">kg</span>
+                    <span class="absolute left-2.5 top-2 text-[10px] text-muted-foreground select-none pointer-events-none">kg</span>
                   </div>
                 </div>
 
@@ -178,11 +187,12 @@
                       type="number"
                       step="0.01"
                       min="0.1"
-                      class="h-8 pl-9 pr-2.5 text-xs bg-card rounded-xl text-left"
+                      dir="ltr"
+                      class="h-8 pl-8 pr-2.5 text-xs bg-card rounded-xl text-left tabular-nums"
                       value={draftPipeWeights[`${item.value}-0.30`]}
                       oninput={(e) => updateWeight(`${item.value}-0.30`, e.target.value)}
                     />
-                    <span class="absolute left-2.5 top-2.5 text-[10px] text-muted-foreground">kg</span>
+                    <span class="absolute left-2.5 top-2 text-[10px] text-muted-foreground select-none pointer-events-none">kg</span>
                   </div>
                 </div>
               </div>
@@ -198,7 +208,7 @@
           <span>قیمت‌ها بر مبنای هر <strong>شاخه ۱.۸ متری استاندارد</strong> به ریال است.</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 py-px">
           {#each PIPE_SIZES as item}
             <Card class="border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors p-3.5 rounded-2xl shadow-none">
               <div class="flex items-center justify-between mb-2">
@@ -216,11 +226,12 @@
                   <Input
                     type="text"
                     inputmode="numeric"
-                    class="h-8 pl-10 pr-2.5 text-xs bg-card rounded-xl text-left"
+                    dir="ltr"
+                    class="h-8 pl-10 pr-2.5 text-xs bg-card rounded-xl text-left tabular-nums"
                     value={formatNumber(draftInsulationPrices[item.value])}
                     oninput={(e) => updateInsulationPrice(item.value, e.target.value)}
                   />
-                  <span class="absolute left-2.5 top-2.5 text-[10px] text-muted-foreground">ریال</span>
+                  <span class="absolute left-2.5 top-2 text-[10px] text-muted-foreground select-none pointer-events-none">ریال</span>
                 </div>
               </div>
             </Card>
@@ -235,7 +246,7 @@
           <span>تنظیم قیمت واحد (ریال) و متراژ لوله‌ای که هر عدد پرایمر پوشش می‌دهد (متر).</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 py-px">
           {#each Object.entries(draftPrimerTypes) as [key, item]}
             <Card class="border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors p-3.5 rounded-2xl shadow-none">
               <div class="flex items-center justify-between mb-2">
@@ -254,11 +265,12 @@
                     <Input
                       type="text"
                       inputmode="numeric"
-                      class="h-8 pl-10 pr-2.5 text-xs bg-card rounded-xl text-left"
+                      dir="ltr"
+                      class="h-8 pl-10 pr-2.5 text-xs bg-card rounded-xl text-left tabular-nums"
                       value={formatNumber(item.price)}
                       oninput={(e) => updatePrimerPrice(key, e.target.value)}
                     />
-                    <span class="absolute left-2.5 top-2.5 text-[10px] text-muted-foreground">ریال</span>
+                    <span class="absolute left-2.5 top-2 text-[10px] text-muted-foreground select-none pointer-events-none">ریال</span>
                   </div>
                 </div>
 
@@ -269,11 +281,12 @@
                       type="number"
                       step="0.5"
                       min="0.5"
-                      class="h-8 pl-8 pr-2.5 text-xs bg-card rounded-xl text-left"
+                      dir="ltr"
+                      class="h-8 pl-7 pr-2.5 text-xs bg-card rounded-xl text-left tabular-nums"
                       value={item.perLength}
                       oninput={(e) => updatePrimerLength(key, e.target.value)}
                     />
-                    <span class="absolute left-2.5 top-2.5 text-[10px] text-muted-foreground">m</span>
+                    <span class="absolute left-2.5 top-2 text-[10px] text-muted-foreground select-none pointer-events-none">m</span>
                   </div>
                 </div>
               </div>
@@ -330,7 +343,7 @@
   <Dialog.Root bind:open={isOpen}>
     <Dialog.Content
       showCloseButton={false}
-      class="sm:max-w-2xl max-w-2xl p-0 gap-0 overflow-hidden flex flex-col max-h-[85vh] bg-card text-card-foreground border-border rounded-3xl shadow-2xl"
+      class="sm:max-w-2xl max-w-2xl p-0 gap-0 overflow-hidden flex flex-col max-h-[85vh]"
     >
       <Dialog.Header class="px-6 py-4 border-b border-border/70 flex flex-row items-center justify-between text-right bg-card/60 backdrop-blur-md">
         <div class="flex items-center gap-3">
@@ -338,11 +351,16 @@
             <Settings class="size-5 text-primary" />
           </div>
           <div class="text-right">
-            <Dialog.Title class="text-base font-bold text-foreground">تنظیمات مقادیر اولیه</Dialog.Title>
-            <Dialog.Description class="text-xs text-muted-foreground">سفارشی‌سازی اوزان، قیمت‌های عایق و پرایمر</Dialog.Description>
+            <div class="flex items-center gap-2">
+              <Dialog.Title>تنظیمات مقادیر اولیه</Dialog.Title>
+              <Badge variant="outline" class="text-[10px] font-bold text-orange-600 dark:text-orange-400 border-orange-500/30">
+                {store.activePreset?.name}
+              </Badge>
+            </div>
+            <Dialog.Description>سفارشی‌سازی اوزان، قیمت‌های عایق و پرایمر برای این الگو</Dialog.Description>
           </div>
         </div>
-        <Button variant="ghost" size="icon" class="rounded-full size-8" onclick={close} title="بستن">
+        <Button variant="ghost" size="icon" class="rounded-full size-8 cursor-pointer hover:bg-muted" onclick={close} title="بستن">
           <X class="size-4" />
         </Button>
       </Dialog.Header>
@@ -364,8 +382,13 @@
             <Settings class="size-5 text-primary" />
           </div>
           <div class="text-right">
-            <Drawer.Title class="text-base font-bold text-foreground">تنظیمات مقادیر اولیه</Drawer.Title>
-            <Drawer.Description class="text-xs text-muted-foreground">سفارشی‌سازی اوزان، قیمت‌های عایق و پرایمر</Drawer.Description>
+            <div class="flex items-center gap-2">
+              <Drawer.Title class="text-base font-bold text-foreground">تنظیمات مقادیر اولیه</Drawer.Title>
+              <Badge variant="outline" class="text-[10px] font-bold text-orange-600 dark:text-orange-400 border-orange-500/30">
+                {store.activePreset?.name}
+              </Badge>
+            </div>
+            <Drawer.Description class="text-xs text-muted-foreground">سفارشی‌سازی اوزان، قیمت‌های عایق و پرایمر برای این الگو</Drawer.Description>
           </div>
         </div>
         <Button variant="ghost" size="icon" class="rounded-full size-8" onclick={close} title="بستن">
@@ -375,7 +398,7 @@
 
       {@render modalBody()}
 
-      <Drawer.Footer class="px-6 py-3.5 border-t border-border/70 flex flex-row items-center justify-between bg-card/90 backdrop-blur-md">
+      <Drawer.Footer class="flex-row items-center justify-between!">
         {@render footerButtons()}
       </Drawer.Footer>
     </Drawer.Content>

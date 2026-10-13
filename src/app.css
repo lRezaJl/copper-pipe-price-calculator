@@ -192,4 +192,29 @@
     align-items: center;
     justify-content: flex-start;
   }
+
+  /* حذف فلش‌های پیش‌فرض استپر مرورگر در اینپوت‌های عددی */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* ایزوله‌سازی جهت فیلدهای عددی و LTR از محیط RTL صفحه */
+  input[type="number"],
+  input[inputmode="numeric"],
+  input[inputmode="decimal"],
+  input[dir="ltr"] {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  input[dir="rtl"] {
+    direction: rtl;
+    unicode-bidi: isolate;
+  }
 }

@@ -1,7 +1,7 @@
 {
   "name": "copperpipe-calculator",
   "private": true,
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "ماشین حساب قیمت لوله مسی، عایق و پرایمر با Svelte 5",
   "type": "module",
   "scripts": {

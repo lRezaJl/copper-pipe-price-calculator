@@ -1,6 +1,6 @@
 <script>
   import { store } from '../lib/calculatorState.svelte.js';
-  import { formatNumber } from '../lib/calculator.js';
+  import { formatNumber, toEnglishDigits } from '../lib/calculator.js';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Badge } from '$lib/components/ui/badge';
@@ -15,11 +15,24 @@
   });
 
   function handleInput(e) {
-    const raw = e.target.value.replace(/[^0-9]/g, '');
-    const num = raw ? parseInt(raw, 10) : 0;
+    const english = toEnglishDigits(e.target.value);
+    const raw = english.replace(/[^0-9]/g, '');
+    if (!raw) {
+      store.unitPrice = 0;
+      displayValue = '';
+      store.saveToStorage();
+      return;
+    }
+    const num = parseInt(raw, 10);
     store.unitPrice = num;
     displayValue = formatNumber(num);
     store.saveToStorage();
+  }
+
+  function handleBlur() {
+    if (!displayValue || store.unitPrice === 0) {
+      displayValue = formatNumber(store.unitPrice);
+    }
   }
 
   function stepUp() {
@@ -116,13 +129,15 @@
             id="unit-price-input"
             type="text"
             inputmode="numeric"
-            class="text-center font-bold text-base sm:text-lg pl-12 pr-4 bg-background/40 backdrop-blur-sm"
-            placeholder="مثال: 53,000,000"
+            dir="ltr"
+            class="text-center font-bold text-base sm:text-lg pl-12 pr-12 bg-background/40 backdrop-blur-sm tabular-nums"
+            placeholder="53,000,000"
             value={displayValue}
             oninput={handleInput}
+            onblur={handleBlur}
             onkeydown={handleKeyDown}
           />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
             ریال
           </span>
         </div>
